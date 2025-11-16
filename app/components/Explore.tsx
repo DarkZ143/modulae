@@ -124,15 +124,25 @@ const Explore = () => {
                   alt={category.altText}
                   width={128}
                   height={128}
-                  className="absolute right-0 bottom-0 w-24 h-24 md:w-32 md:h-32 object-contain object-bottom-right transition-transform duration-500 ease-in-out translate-x-1/2 group-hover:translate-x-0"
+                  className="
+    absolute right-0 bottom-0
+    w-28 h-28               /* Bigger on mobile */
+    object-contain object-bottom-right
+    
+    /* DESKTOP ONLY ANIMATIONS */
+    md:w-32 md:h-32
+    md:transition-transform md:duration-500 md:ease-in-out
+    md:translate-x-1/2 md:group-hover:translate-x-0
+  "
                   onError={(e) => {
                     const target = e.target as HTMLImageElement;
                     target.src =
-                      "https://placehold.co/200x200/F9F9F9/333?text=Image";
+                      'https://placehold.co/200x200/F9F9F9/333?text=Image';
                   }}
                   unoptimized
                 />
-                
+
+
               </div>
             </a>
           ))}

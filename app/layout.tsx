@@ -1,6 +1,14 @@
+// app/layout.tsx
+
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import GlobalRouteLoader from "./components/GlobalRouteLoader";
+import { AuthProvider } from "./context/AuthContext";
+import { Suspense } from "react"; // <-- Import Suspense
+
+// --- [STEP 1] Import your new wrapper ---
+import LayoutWrapper from "./components/LayoutWrapper"; // <-- Make sure this path is correct!
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -27,7 +35,16 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        {children}
+        <AuthProvider>
+          {/* --- [STEP 2] Wrap your client components in Suspense --- */}
+          {/* Both GlobalRouteLoader and LayoutWrapper use client hooks,
+              so they must be wrapped in Suspense to avoid build errors. */}
+          <Suspense>
+            <GlobalRouteLoader />
+            <LayoutWrapper>{children}</LayoutWrapper>
+          </Suspense>
+
+        </AuthProvider>
       </body>
     </html>
   );
