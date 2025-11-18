@@ -6,10 +6,12 @@ import { initializeApp, getApps, getApp } from "firebase/app";
 import { getAuth, GoogleAuthProvider } from "firebase/auth";
 import { getAnalytics, isSupported } from "firebase/analytics";
 
-// [THE FIX] Make SURE you import from "firebase/firestore"
+// Firestore → for USERS
 import { getFirestore } from "firebase/firestore";
 
-// --- Your Firebase Config ---
+// Realtime DB → for PRODUCTS, ORDERS, CART
+import { getDatabase } from "firebase/database";
+
 const firebaseConfig = {
     apiKey: "AIzaSyA01gjB07YA6UvJ1LbKapdexCcXoLXXEF4",
     authDomain: "modulae-users.firebaseapp.com",
@@ -18,25 +20,31 @@ const firebaseConfig = {
     messagingSenderId: "239086330356",
     appId: "1:239086330356:web:de156be2c962ba93ee59a1",
     measurementId: "G-M60EJDNFF7",
+
+    // REQUIRED FOR REALTIME DB
+    databaseURL: "https://modulae-users-default-rtdb.asia-southeast1.firebasedatabase.app",
+
 };
 
-// --- Prevent double initialization ---
+// Prevent re-initialization
 const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
 
-// --- Auth ---
+// Auth
 export const auth = getAuth(app);
 export const googleProvider = new GoogleAuthProvider();
 
-// [THE FIX] Make SURE you use getFirestore(app)
-// and that you EXPORT it.
+// Firestore (keep name "db")
 export const db = getFirestore(app);
 
-// --- Analytics (Client Only) ---
+// Realtime DB (renamed)
+export const rtdb = getDatabase(app);
+
+// Analytics
 export let analytics: any = null;
 
 if (typeof window !== "undefined") {
-    isSupported().then((yes) => {
-        if (yes) analytics = getAnalytics(app);
+    isSupported().then((ok) => {
+        if (ok) analytics = getAnalytics(app);
     });
 }
 

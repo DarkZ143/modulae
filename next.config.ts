@@ -2,18 +2,22 @@
 const nextConfig = {
   reactStrictMode: true,
 
+  images: {
+    domains: ["res.cloudinary.com"], // 👈 Allow Cloudinary images
+  },
+
   async headers() {
     return [
       {
-        source: '/:path*',
+        source: "/:path*",
         headers: [
           {
-            key: 'Cross-Origin-Opener-Policy',
-            value: 'same-origin-allow-popups',
+            key: "Cross-Origin-Opener-Policy",
+            value: "same-origin-allow-popups",
           },
           {
-            key: 'Cross-Origin-Embedder-Policy',
-            value: 'unsafe-none',
+            key: "Cross-Origin-Embedder-Policy",
+            value: "unsafe-none",
           },
         ],
       },

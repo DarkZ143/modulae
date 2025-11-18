@@ -1,8 +1,17 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @next/next/no-html-link-for-pages */
 "use client";
 
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
+// ⭐ CART SYSTEM IMPORTS
+import { auth, rtdb } from "@/lib/firebase";
+import { onAuthStateChanged } from "firebase/auth";
+import { ref, onValue } from "firebase/database";
+
+
+
+
 
 // ---------------- SLUG + STATIC PAGES ----------------
 const slugify = (text: string) =>
@@ -26,6 +35,7 @@ const staticPages: Record<string, string> = {
 // -----------------------------------------------------
 
 const Navbar = () => {
+
   const [isOpen, setIsOpen] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
   const [categoryOpen, setCategoryOpen] = useState(false);
@@ -36,6 +46,9 @@ const Navbar = () => {
 
   // --- State for Desktop Search ---
   const [isDesktopSearchOpen, setIsDesktopSearchOpen] = useState(false);
+  // ⭐ CART COUNT STATE
+  const [cartCount, setCartCount] = useState(0);
+
   const [searchQuery, setSearchQuery] = useState("");
   const router = useRouter();
 
@@ -44,169 +57,117 @@ const Navbar = () => {
     {
       title: "Living",
       categories: {
-        "Sofa and Recliner": [
+        Sofas: [
           "All Sofa Sets",
-          "Recliners",
-          "Plus Sofas",
-          "Leatherette Sofas",
-          "Single Seater Sofa",
-          "3 Seater Sofas",
           "L Shape Sofas",
+          "3 Seater Sofas",
+          "2 Seater Sofas",
+          "Single Seater Sofas",
+          "Recliners",
           "Sofa Cum Beds",
-          "Cushion & Cushion Cover",
         ],
-        "Chairs And Seating": [
-          "All Chairs",
-          "Office Chairs",
+        Seating: [
           "Lounge Chairs",
-          "Wing Chairs",
-          "Gaming Chairs",
-          "Bean Bags",
+          "Accent Chairs",
           "Ottomans",
+          "Benches",
         ],
         "TV Units": [
-          "All TV Units",
+          "Wooden TV Units",
           "Engineered Wood TV Units",
           "Solid Wood TV Units",
         ],
-        "Living Room Storage": [
-          "All Book Shelves",
-          "Wall Shelf",
-          "All Shoe Racks",
+        Storage: [
+          "Bookshelves",
+          "Display Units",
+          "Shoe Racks",
           "Sideboards",
           "Chest of Drawers",
-          "Display Units",
         ],
         Tables: [
-          "All Coffee Tables",
-          "Premium Coffee Tables",
-          "Solid Wood Coffee Tables",
           "Center Tables",
+          "Coffee Tables",
           "Side Tables",
-          "Computer Tables",
-        ],
-        "Wall Decor & Curtain": [
-          "Wall Arts",
-          "Wall Clocks",
-          "Paintings",
-          "Wall Mirrors",
-          "Curtains",
-        ],
-        "Lamp And Other Decors": [
-          "Hanging Pendants",
-          "Table Lamps",
-          "Study Lamps",
-          "Planters",
-          "Table Accents",
+          "Console Tables",
         ],
       },
     },
-    // ... (other menu items: Dining, Bedroom, Kitchen, Pages) ...
     {
       title: "Dining",
       categories: {
-        "Dining Furnitures": [
-          "Dining Sets",
+        "Dining Furniture": [
           "4 Seater Dining Sets",
           "6 Seater Dining Sets",
-          "Metal & Glass Dining Sets",
-          "Dining Table",
+          "Dining Tables",
           "Dining Chairs",
-          "Luxury Dining",
+          "Benches",
         ],
-        "Dining Decors": ["Hanging Pendants", "Curtains"],
-        Dinnerware: [
-          "Dinner Plates",
-          "Quarter Plates",
-          "Bowls",
-          "Dinner Sets",
-          "Serving Bowls",
+        Storage: [
+          "Sideboards",
+          "Crockery Units",
         ],
-        Serveware: ["Serving Bowls", "Casseroles"],
-        Cookware: ["Kadhai & Woks", "Pans & Skillets", "Tawas", "Cookware Sets"],
-        "Dining Storages": ["Sideboards", "Chest of Drawers", "Wall Shelf"],
+        Surfaces: [
+          "Dining Table Marble Tops",
+          "Granite Tops",
+          "Wooden Tops",
+        ],
       },
     },
     {
       title: "Bedroom",
       categories: {
         Beds: [
-          "All Beds",
-          "Solid Wood Beds",
-          "Engineered Wood Beds",
-          "Sheesham Wood Beds",
-          "Metal Beds",
-          "Upholstered Beds",
+          "King Size Beds",
+          "Queen Size Beds",
           "Hydraulic Beds",
-          "Kids Bed",
-        ],
-        Beddings: [
-          "Mattress Protectors",
-          "Fitted Bedsheets",
-          "Flat Bedsheets",
-          "Comforters",
-          "Blankets",
-          "Pillow Covers",
-          "Duvet Covers",
-          "All Bedsheets",
-        ],
-        "Pillows and Cushions": [
-          "Sleeping Pillows",
-          "Support Pillows",
-          "Maternity and Baby Pillows",
-          "Cushion & Cushion Cover",
-          "Car Cushions",
-          "Memory Foam Pillows",
+          "Storage Beds",
+          "Solid Wood Beds",
         ],
         Wardrobes: [
-          "All Wardrobes",
-          "Luxury Wardrobes",
-          "Engineered Wood Wardrobes",
-          "Solid Wood Wardrobes",
           "2 Door Wardrobes",
           "3 Door Wardrobes",
+          "Sliding Door Wardrobes",
+          "Solid Wood Wardrobes",
         ],
-        "Bedroom Tables": [
+        Tables: [
           "Bedside Tables",
-          "Premium Bedside Tables",
           "Dressing Tables",
-          "Computer Tables",
+          "Study Tables",
         ],
-        "Decor and Curtain": [
-          "Curtains",
-          "Hanging Pendants",
-          "Wall Clocks",
-          "Wall Arts",
-          "Table Lamps",
-          "Wall Mirrors",
+        Storage: [
+          "Chest of Drawers",
         ],
-        Balcony: ["Deck Tiles", "Artificial Grass"],
+        Flooring: [
+          "Bedroom Floor Tiles",
+          "Wooden Flooring",
+        ]
       },
     },
     {
       title: "Kitchen",
       categories: {
-        Dinnerware: [
-          "Dinner Plates",
-          "Quarter Plates",
-          "Bowls",
-          "Dinner Sets",
-          "Serving Bowls",
+        Furniture: [
+          "Modular Cabinets",
+          "Base Cabinets",
+          "Wall Cabinets",
         ],
-        Serveware: ["Serving Bowls", "Casseroles"],
-        "Cups And Mugs": ["Cups & Saucers", "Mugs & Kullhads"],
-        Cookware: [
-          "Kadhai & Woks",
-          "Pans and Skillets",
-          "Tawas",
-          "Casserole",
-          "Cookware Sets",
+        Slabs: [
+          "Granite Slabs",
+          "Marble Slabs",
+          "Quartz Slabs",
         ],
-        "Table Linens": ["Placemats & Chargers"],
-        Drinkware: ["Bottles & Flasks", "Cups & Saucers", "Tumblers"],
-        "Kitchen Storage": ["Glass Container", "Storage Basket"],
+        Tiles: [
+          "Kitchen Wall Tiles",
+          "Kitchen Floor Tiles",
+          "Anti-Skid Tiles",
+        ],
+        Storage: [
+          "Pantry Units",
+          "Open Shelves",
+        ],
       },
     },
+
     {
       title: "Pages",
       categories: {
@@ -249,6 +210,41 @@ const Navbar = () => {
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
+  // ⭐ LISTEN FOR CART CHANGES (Firebase)
+  useEffect(() => {
+    let unsubCart: any = null;
+
+    const unsubAuth = onAuthStateChanged(auth, (user) => {
+      if (!user) {
+        setCartCount(0);
+        return;
+      }
+
+      const cartRef = ref(rtdb, `carts/${user.uid}`);
+
+      unsubCart = onValue(cartRef, (snapshot) => {
+        if (!snapshot.exists()) {
+          setCartCount(0);
+          return;
+        }
+
+        const cartData: any = snapshot.val();
+        let totalQty = 0;
+
+        Object.values(cartData).forEach((item: any) => {
+          totalQty += item.qty;
+        });
+
+        setCartCount(totalQty);
+      });
+    });
+
+    return () => {
+      if (unsubCart) unsubCart();
+      unsubAuth();
+    };
+  }, []);
+
 
   const handleMenuToggle = (title: string) => {
     setActiveDropdown((prev) => (prev === title ? null : title));
@@ -498,14 +494,22 @@ const Navbar = () => {
               <IconSearch className="w-6 h-6" />
             </button>
 
-            <button className="relative flex items-center gap-1">
-              <p className="hidden md:block">My Bag</p>
+            <button
+              onClick={() => router.push("/cart")}
+              className="relative flex items-center gap-1"
+            >
+              <p className="hidden md:block cursor-pointer">My Bag</p>
               <IconBag className="w-5 h-5" />
-              <span className="hidden md:block text-sm">(0)</span>
+
+              {/* DESKTOP COUNT */}
+              <span className="hidden md:block text-sm">({cartCount})</span>
+
+              {/* MOBILE COUNT */}
               <span className="md:hidden absolute -top-1 -right-2 w-4 h-4 bg-orange-500 text-white text-xs font-bold rounded-full flex justify-center">
-                0
+                {cartCount}
               </span>
             </button>
+
           </div>
         </div>
       </nav>
