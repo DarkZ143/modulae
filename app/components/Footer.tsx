@@ -3,28 +3,28 @@
 
 // Data for the footer links
 const infoLinks1 = [
-  { name: "About Us", href: "#" },
-  { name: "Help & Advice", href: "#" },
-  { name: "Furniture Magazine", href: "#" },
-  { name: "FR Collections", href: "#" },
-  { name: "Purchase Protection", href: "#" },
-  { name: "Meet Experts", href: "#" },
+  { name: "About Us", href: "/pages/about-us" },
+  { name: "Help & Advice", href: "/pages/help-and-advice" },
+  { name: "Furniture Magazine", href: "/pages/furniture-magazine" },
+  { name: "FR Collections", href: "/shop" },
+  { name: "Purchase Protection", href: "/pages/purchase-protection" },
+  { name: "Meet Experts", href: "/pages/meet-experts" },
 ];
 
 const infoLinks2 = [
-  { name: "Furniture Business", href: "#" },
-  { name: "Contact Us", href: "#" },
-  { name: "Gift Vouchers", href: "#" },
-  { name: "Gallery", href: "#" },
-  { name: "Brands", href: "#" },
-  { name: "Help Topics", href: "#" },
+  { name: "Furniture Business", href: "/pages/furniture-business" },
+  { name: "Contact Us", href: "/pages/contact-us" },
+  { name: "Gift Vouchers", href: "/pages/gift-vouchers" },
+  { name: "Gallery", href: "/pages/gallery" },
+  { name: "Brands", href: "/pages/brands" },
+  { name: "Help Topics", href: "/pages/faq" },
 ];
 
 const subFooterLinks = [
-  { name: "About Us", href: "#" },
-  { name: "Services", href: "#" },
-  { name: "Privacy", href: "#" },
-  { name: "Terms & Conditions", href: "#" },
+  { name: "About Us", href: "/pages/about-us" },
+  { name: "Services", href: "/pages/services" },
+  { name: "Privacy", href: "/pages/privacy-policy" },
+  { name: "Terms & Conditions", href: "/pages/terms" },
 ];
 
 const Footer = () => {

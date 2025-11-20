@@ -11,6 +11,7 @@ const adData = [
     alt: "Wide promotional ad",
     gridSpan: "lg:col-span-2", // This ad will span 2 columns on large screens
     aspectClass: "aspect-[2/1]", // Enforces a 2:1 aspect ratio
+    Href: "/shop",
   },
   {
     id: 2,
@@ -18,6 +19,7 @@ const adData = [
     alt: "Square promotional ad",
     gridSpan: "lg:col-span-1", // This ad will span 1 column
     aspectClass: "aspect-square", // Enforces a 1:1 aspect ratio
+     Href: "/shop",
   },
   {
     id: 3,
@@ -25,6 +27,7 @@ const adData = [
     alt: "Another square promotional ad",
     gridSpan: "lg:col-span-1", // This ad will span 1 column
     aspectClass: "aspect-square", // Enforces a 1:1 aspect ratio
+     Href: "/shop",
   },
 ];
 
@@ -40,7 +43,7 @@ const Ad1 = () => {
           {adData.map((ad) => (
             <a
               key={ad.id}
-              href="#"
+              href={ad.Href}
               className={`group relative block ${ad.gridSpan} ${ad.aspectClass} overflow-hidden rounded-lg shadow-sm transition-shadow duration-300 ease-in-out hover:shadow-lg cursor-pointer`}
             >
               <Image

@@ -2,62 +2,72 @@
 
 import React from "react";
 import Image from "next/image";
+import Link from "next/link"; // Import Next.js Link
 
-// Data for the category cards. You can replace these with your own data.
+// Updated Data with correct Links matching your Database categories
 const categories = [
   {
-    name: "chair",
-    items: 1,
+    name: "Chairs",
+    items: 9,
     imageUrl: "/explore/chair.png",
     altText: "A modern chair",
+    href: "/chairs", // changed key to 'href' for standard Next.js naming
   },
   {
     name: "Dining",
     items: 9,
     imageUrl: "/explore/dinning.png",
     altText: "A dining table and chairs",
+    href: "/dining",
   },
   {
     name: "Furniture",
     items: 24,
     imageUrl: "/explore/furniture.png",
     altText: "A bed with a headboard",
+    href: "/furniture",
   },
   {
-    name: "lamp",
+    name: "Lamps",
     items: 16,
     imageUrl: "/explore/lamp.png",
     altText: "A floor lamp",
+    href: "/lamps",
   },
   {
     name: "Shoe Racks",
     items: 24,
     imageUrl: "/explore/shoerack.png",
     altText: "A wooden shoe rack",
+    href: "/shoe-racks",
   },
   {
-    name: "Sofa Set",
+    name: "Sofa Sets",
     items: 24,
     imageUrl: "/explore/sofaset.png",
     altText: "A grey sofa",
+    href: "/sofa-sets",
   },
   {
-    name: "Table",
+    name: "Tables",
     items: 24,
     imageUrl: "/explore/table.png",
     altText: "A wooden table",
+    href: "/dining", // Linking to dining since tables are usually there
   },
   {
-    name: "TV Unit",
+    name: "TV Units",
     items: 11,
     imageUrl: "/explore/tvunit.png",
     altText: "A TV entertainment unit",
+    href: "/tv-units",
   },
   {
     name: "Wardrobes",
     items: 24,
     imageUrl: "/explore/wardrobes.png",
     altText: "A modern wardrobe",
+    href: "/wardrobes",
   },
 ];
 
@@ -78,9 +88,9 @@ const Explore = () => {
         {/* Categories Grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-6">
           {categories.map((category) => (
-            <a
+            <Link
               key={category.name}
-              href="#"
+              href={category.href}
               className="group relative block bg-orange-50 rounded-lg shadow-sm overflow-hidden transition-all duration-1000 ease-in-out hover:shadow-lg"
             >
               {/* Card content */}
@@ -125,15 +135,15 @@ const Explore = () => {
                   width={128}
                   height={128}
                   className="
-    absolute right-0 bottom-0
-    w-28 h-28               /* Bigger on mobile */
-    object-contain object-bottom-right
-    
-    /* DESKTOP ONLY ANIMATIONS */
-    md:w-32 md:h-32
-    md:transition-transform md:duration-500 md:ease-in-out
-    md:translate-x-1/2 md:group-hover:translate-x-0
-  "
+                    absolute right-0 bottom-0
+                    w-28 h-28
+                    object-contain object-bottom-right
+                    
+                    /* DESKTOP ONLY ANIMATIONS */
+                    md:w-32 md:h-32
+                    md:transition-transform md:duration-500 md:ease-in-out
+                    md:translate-x-1/2 md:group-hover:translate-x-0
+                  "
                   onError={(e) => {
                     const target = e.target as HTMLImageElement;
                     target.src =
@@ -141,10 +151,8 @@ const Explore = () => {
                   }}
                   unoptimized
                 />
-
-
               </div>
-            </a>
+            </Link>
           ))}
         </div>
       </div>
