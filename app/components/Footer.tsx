@@ -3,6 +3,7 @@
 
 // Data for the footer links
 const infoLinks1 = [
+  { name: "Admin Panel", href: "/admin-section" },
   { name: "About Us", href: "/pages/about-us" },
   { name: "Help & Advice", href: "/pages/help-and-advice" },
   { name: "Furniture Magazine", href: "/pages/furniture-magazine" },
