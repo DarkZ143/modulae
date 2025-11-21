@@ -5,14 +5,15 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { auth } from "@/lib/firebase";
 import { onAuthStateChanged, signOut } from "firebase/auth";
-// ✅ Import Star Icon for Reviews
-import { Package, ShoppingCart, LogOut, Star } from "lucide-react";
+import { Package, ShoppingCart, LogOut, Star, MessageSquare } from "lucide-react";
 
 // Import Components
 import AdminProducts from "./AdminProducts";
 import AdminOrders from "./AdminOrders";
-import AdminReviews from "./AdminReviews"; // ✅ Import New Component
+import AdminReviews from "./AdminReviews";
+import AdminSupport from "./AdminSupport"; // ✅ Make sure you created this file from previous steps
 
+// ✅ SECURITY: List of allowed Admin Emails
 const ALLOWED_ADMINS = [
     "themodulae@gmail.com",
     "therbsound@gmail.com"
@@ -24,12 +25,13 @@ export default function AdminDashboard() {
     const [activeTab, setActiveTab] = useState("products");
     const [loading, setLoading] = useState(true);
 
-   useEffect(() => {
+    useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
             if (!currentUser) {
                 router.push("/admin-section/login");
-            // ✅ UPDATE CHECK
-            } else if (!ALLOWED_ADMINS.includes(currentUser.email || "")) {
+            } 
+            // ✅ Check if email exists in the allowed array
+            else if (!ALLOWED_ADMINS.includes(currentUser.email || "")) {
                 alert("Security Alert: Unauthorized Access.");
                 signOut(auth);
                 router.push("/admin-section/login");
@@ -66,9 +68,13 @@ export default function AdminDashboard() {
                         <ShoppingCart className="w-5 h-5" /> Orders
                     </button>
 
-                    {/* ✅ NEW REVIEWS TAB */}
                     <button onClick={() => setActiveTab("reviews")} className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${activeTab === 'reviews' ? 'bg-orange-600 text-white' : 'hover:bg-gray-800 text-gray-400'}`}>
                         <Star className="w-5 h-5" /> Reviews
+                    </button>
+
+                    {/* ✅ SUPPORT TAB (For Chatbot Queries) */}
+                    <button onClick={() => setActiveTab("support")} className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${activeTab === 'support' ? 'bg-orange-600 text-white' : 'hover:bg-gray-800 text-gray-400'}`}>
+                        <MessageSquare className="w-5 h-5" /> Support
                     </button>
                 </nav>
 
@@ -84,7 +90,8 @@ export default function AdminDashboard() {
             <main className="ml-64 flex-1 p-8 overflow-y-auto">
                 {activeTab === "products" && <AdminProducts />}
                 {activeTab === "orders" && <AdminOrders />}
-                {activeTab === "reviews" && <AdminReviews />} {/* ✅ Render Component */}
+                {activeTab === "reviews" && <AdminReviews />}
+                {activeTab === "support" && <AdminSupport />}
             </main>
         </div>
     );

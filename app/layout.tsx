@@ -9,6 +9,7 @@ import { Suspense } from "react"; // <-- Import Suspense
 
 // --- [STEP 1] Import your new wrapper ---
 import LayoutWrapper from "./components/LayoutWrapper"; // <-- Make sure this path is correct!
+import ChatBot from "./components/ChatBot";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -41,7 +42,9 @@ export default function RootLayout({
               so they must be wrapped in Suspense to avoid build errors. */}
           <Suspense>
             <GlobalRouteLoader />
-            <LayoutWrapper>{children}</LayoutWrapper>
+            <LayoutWrapper>{children}
+              <ChatBot />
+            </LayoutWrapper>
           </Suspense>
 
         </AuthProvider>

@@ -164,11 +164,7 @@ const Footer = () => {
         </div>
       </div>
 
-      {/* --- Floating Chat Button --- */}
-      <button className="fixed bottom-4 right-4 bg-black text-white px-5 py-3 rounded-full shadow-lg flex items-center gap-2 text-sm z-50">
-        <IconChat />
-        Chat
-      </button>
+     
     </footer>
   );
 };
@@ -214,15 +210,7 @@ const IconInstagram = ({ className = "" }: { className?: string }) => (
   </svg>
 );
 
-const IconChat = ({ className = "" }: { className?: string }) => (
-  <svg
-    className={`w-5 h-5 ${className}`}
-    fill="currentColor"
-    viewBox="0 0 24 24"
-  >
-    <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z" />
-  </svg>
-);
+
 
 // Payment Icons (simple placeholders)
 const IconDiscover = () => (
