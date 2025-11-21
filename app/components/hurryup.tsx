@@ -1,120 +1,147 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
+import { ref, get } from "firebase/database";
+import { rtdb } from "@/lib/firebase";
 
-// Mock data — now with slug for hero product linking
-const products = [
-    {
-        id: 1,
-        slug: "woolen-chair",
-        name: "Woolen Chair",
-        price: 450.0,
-        originalPrice: 500.0,
-        imageUrl: "/latest/woolen.png",
-        altText: "Woolen Chair",
-        onSale: true,
-    },
-    {
-        id: 2,
-        slug: "white-lounge-chair",
-        name: "White Lounge Chair",
-        price: 350.0,
-        originalPrice: null,
-        imageUrl: "/latest/lounge.png",
-        altText: "White Lounge Chair",
-        onSale: false,
-    },
-    {
-        id: 3,
-        slug: "swoon-petit-lounge-chair",
-        name: "Swoon Petit Lounge Chair",
-        price: 450.0,
-        originalPrice: 500.0,
-        imageUrl: "/latest/petit.png",
-        altText: "Swoon Petit Lounge Chair",
-        onSale: true,
-    },
-    {
-        id: 4,
-        slug: "modern-woolen-chair",
-        name: "Modern Woolen Chair",
-        price: 500.0,
-        originalPrice: null,
-        imageUrl: "/latest/modern.png",
-        altText: "Modern Woolen Chair",
-        onSale: false,
-    },
+// List of all categories to fetch from
+const CATEGORIES = [
+  "products",
+  "chairs",
+  "dining",
+  "furniture",
+  "kitchen",
+  "lamps",
+  "shoe-racks",
+  "sofa-sets",
+  "tv-units",
+  "wardrobes",
 ];
 
 const HurryUp = () => {
-    const formatCurrency = (amount: number) => `Rs. ${amount.toFixed(2)}`;
+  const [products, setProducts] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
-    return (
-        <section className="w-full bg-white py-12 md:py-16">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+  const formatCurrency = (amount: number) => `Rs. ${amount.toFixed(2)}`;
 
-                {/* Title */}
-                <div className="mb-10">
-                    <h2 className="text-3xl md:text-4xl font-bold text-gray-900 inline-block">
-                        <span className="border-b-4 border-orange-500 pb-1">Hurry!</span> Time is running out
-                    </h2>
-                </div>
+  useEffect(() => {
+    const fetchLowStockProducts = async () => {
+      try {
+        const promises = CATEGORIES.map((category) =>
+          get(ref(rtdb, `${category}/`))
+        );
 
-                {/* Products */}
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-                    {products.map((product) => (
-                        <a
-                            key={product.id}
-                            href={`/products/${product.slug}`}   // <-- LINK FIXED
-                            className="group block overflow-hidden"
-                        >
-                            {/* Image Wrapper */}
-                            <div className="relative aspect-square w-full bg-gray-50 rounded-lg overflow-hidden transition-all duration-300 group-hover:shadow-lg">
+        const snapshots = await Promise.all(promises);
+        let lowStockItems: any[] = [];
 
-                                {/* Sale Badge */}
-                                {product.onSale && (
-                                    <div className="absolute top-3 right-3 bg-orange-500 text-white text-xs font-semibold px-3 py-1 rounded-full z-10">
-                                        Sale
-                                    </div>
-                                )}
+        snapshots.forEach((snap) => {
+          if (snap.exists()) {
+            const data = snap.val();
+            const items = Object.keys(data).map((key) => ({
+              slug: key,
+              ...data[key],
+            }));
+            
+            // FILTER: Only items with stock < 15
+            const filtered = items.filter((item) => Number(item.stock) < 15 && Number(item.stock) > 0);
+            lowStockItems = [...lowStockItems, ...filtered];
+          }
+        });
 
-                                <Image
-                                    src={product.imageUrl}
-                                    alt={product.altText}
-                                    width={300}
-                                    height={300}
-                                    className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-                                    unoptimized
-                                    onError={(e) => {
-                                        (e.target as HTMLImageElement).src =
-                                            "https://placehold.co/300x300/F9F9F9/333?text=Image";
-                                    }}
-                                />
-                            </div>
+        // Shuffle and pick 4 random items
+        const shuffled = lowStockItems.sort(() => 0.5 - Math.random());
+        setProducts(shuffled.slice(0, 4));
+        
+      } catch (error) {
+        console.error("Error fetching hurry up products:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-                            {/* Text */}
-                            <div className="mt-4 text-center md:text-left">
-                                <h3 className="text-base md:text-lg font-medium text-gray-800 group-hover:text-orange-500 transition-colors">
-                                    {product.name}
-                                </h3>
+    fetchLowStockProducts();
+  }, []);
 
-                                <p className="mt-1 text-sm md:text-base font-semibold text-gray-900">
-                                    {formatCurrency(product.price)}
+  // Don't show section if no products match
+  if (!loading && products.length === 0) return null;
 
-                                    {product.originalPrice && (
-                                        <span className="ml-2 text-sm text-gray-500 line-through">
-                                            {formatCurrency(product.originalPrice)}
-                                        </span>
-                                    )}
-                                </p>
-                            </div>
-                        </a>
-                    ))}
-                </div>
+  return (
+    <section className="w-full bg-white py-12 md:py-16 border-t">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+        {/* Title */}
+        <div className="mb-10 text-center md:text-left">
+          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 inline-block">
+            <span className="border-b-4 border-red-500 pb-1 text-red-600">Hurry!</span> Time is running out
+          </h2>
+          <p className="text-gray-500 mt-2">Grab these items before they are gone forever.</p>
+        </div>
+
+        {/* Loading State */}
+        {loading ? (
+           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+             {[...Array(4)].map((_, i) => (
+               <div key={i} className="h-64 bg-gray-100 rounded-lg animate-pulse"></div>
+             ))}
+           </div>
+        ) : (
+            /* Products Grid */
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+            {products.map((product) => {
+                const imageUrl = Array.isArray(product.images) ? product.images[0] : product.image || "/placeholder.png";
+                const offer = product.mrp > product.price;
+
+                return (
+                <Link
+                    key={product.slug}
+                    href={`/products/${product.slug}`}
+                    className="group block overflow-hidden bg-white rounded-lg border border-transparent hover:border-gray-200 transition-all duration-300 hover:shadow-lg"
+                >
+                    {/* Image Wrapper */}
+                    <div className="relative aspect-square w-full bg-gray-50 rounded-lg overflow-hidden">
+                    
+                    {/* Stock Badge */}
+                    <div className="absolute top-3 left-3 bg-red-600 text-white text-[10px] font-bold px-2 py-1 rounded z-10 uppercase tracking-wide shadow-sm animate-pulse">
+                        Only {product.stock} Left!
+                    </div>
+
+                    <Image
+                        src={imageUrl}
+                        alt={product.title}
+                        width={300}
+                        height={300}
+                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                    />
+                    </div>
+
+                    {/* Text */}
+                    <div className="mt-4 p-2">
+                    <h3 className="text-base md:text-lg font-medium text-gray-800 group-hover:text-orange-600 transition-colors truncate">
+                        {product.title}
+                    </h3>
+
+                    <p className="mt-1 text-sm md:text-base font-semibold text-gray-900 flex items-center gap-2">
+                        {formatCurrency(product.price)}
+
+                        {offer && (
+                        <span className="text-gray-400 line-through text-xs font-normal">
+                            {formatCurrency(product.mrp)}
+                        </span>
+                        )}
+                    </p>
+                    </div>
+                </Link>
+                );
+            })}
             </div>
-        </section>
-    );
+        )}
+
+      </div>
+    </section>
+  );
 };
 
 export default HurryUp;
