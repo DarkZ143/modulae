@@ -219,7 +219,7 @@ export default function ChatBot() {
                 ]);
                 setTimeout(() => {
                     setIsOpen(false); 
-                    router.push(`/collections/${slug}?page=1`);
+                    router.push(`/${slug}`);
                 }, 1500);
             }
 
