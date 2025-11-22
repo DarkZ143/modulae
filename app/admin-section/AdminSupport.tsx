@@ -17,15 +17,23 @@ export default function AdminSupport() {
                 const data = snapshot.val();
                 const flatList: any[] = [];
 
+                // DEBUG: Check what data looks like in console
+                console.log("Raw Firebase Data:", data);
+
                 // Flatten nested structure (Users -> Queries)
                 Object.keys(data).forEach((userId) => {
                     const userQueries = data[userId];
                     if (userQueries) {
                         Object.keys(userQueries).forEach((queryId) => {
+                            const q = userQueries[queryId];
                             flatList.push({
                                 id: queryId,
                                 userId: userId, // Keep reference for update/delete
-                                ...userQueries[queryId]
+                                userName: q.userName || "Guest User",
+                                userEmail: q.userEmail || "No Email",
+                                query: q.query || "No message content found.", // Fallback text
+                                date: q.date || new Date().toISOString(),
+                                status: q.status || "Pending"
                             });
                         });
                     }
@@ -78,7 +86,7 @@ export default function AdminSupport() {
                             {/* Header: User Info & Status */}
                             <div className="flex justify-between items-start mb-3">
                                 <div>
-                                    <h4 className="font-bold text-gray-900 text-lg">{q.userName || "Guest User"}</h4>
+                                    <h4 className="font-bold text-gray-900 text-lg">{q.userName}</h4>
                                     <p className="text-xs text-gray-500 font-mono">{q.userEmail}</p>
                                 </div>
                                 <span className={`text-xs font-bold px-3 py-1 rounded-full flex items-center gap-1 shadow-sm 

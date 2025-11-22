@@ -1,15 +1,14 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { useState, useEffect } from "react";
 import { ref, get, remove, update } from "firebase/database";
 import { rtdb } from "@/lib/firebase";
-import { Star, Trash2, User, Calendar, MessageSquare, ExternalLink } from "lucide-react";
+import { Star, Trash2, Calendar, MessageSquare, ExternalLink } from "lucide-react";
 import Link from "next/link";
 
 const CATEGORIES = [
-    "products", "chairs", "dining", "furniture", "kitchen",
+    "products", "chairs", "dining", "furniture", "kitchen", 
     "lamps", "shoe-racks", "sofa-sets", "tv-units", "wardrobes"
 ];
 
@@ -80,14 +79,14 @@ export default function AdminReviews() {
             // B. Recalculate Statistics
             const productRef = ref(rtdb, `${item.category}/${item.productSlug}`);
             const snap = await get(productRef);
-
+            
             if (snap.exists()) {
                 const product = snap.val();
                 const reviewsObj = product.user_reviews || {};
                 const reviewValues: any[] = Object.values(reviewsObj);
 
                 const newTotalReviews = reviewValues.length;
-
+                
                 // Calculate new average
                 let newRating = 0;
                 if (newTotalReviews > 0) {
@@ -133,7 +132,7 @@ export default function AdminReviews() {
                 <div className="grid grid-cols-1 gap-4">
                     {reviews.map((review) => (
                         <div key={review.reviewId} className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition flex flex-col md:flex-row gap-6">
-
+                            
                             {/* Left: User & Rating */}
                             <div className="md:w-1/4 shrink-0">
                                 <div className="flex items-center gap-2 mb-2">
@@ -167,7 +166,7 @@ export default function AdminReviews() {
 
                             {/* Right: Actions */}
                             <div className="flex items-start justify-end">
-                                <button
+                                <button 
                                     onClick={() => handleDelete(review)}
                                     className="flex items-center gap-2 text-red-500 bg-red-50 px-4 py-2 rounded-lg text-sm font-semibold hover:bg-red-100 transition"
                                 >
