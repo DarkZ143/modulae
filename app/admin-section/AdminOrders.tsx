@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
@@ -35,34 +34,34 @@ export default function AdminOrders() {
     const fetchOrders = async () => {
         setLoading(true);
         const ordersRef = ref(rtdb, "orders/");
-        
+
         try {
             const snapshot = await get(ordersRef);
 
             if (snapshot.exists()) {
                 const data = snapshot.val() as Record<string, any>;
-                
+
                 const flattenedOrders: Order[] = [];
 
                 Object.keys(data).forEach((userId) => {
                     const userOrders = data[userId];
-                    
+
                     if (userOrders) {
                         Object.keys(userOrders).forEach((orderId) => {
-                            flattenedOrders.push({ 
-                                id: orderId, 
-                                userId: userId, 
-                                ...userOrders[orderId] 
+                            flattenedOrders.push({
+                                id: orderId,
+                                userId: userId,
+                                ...userOrders[orderId]
                             });
                         });
                     }
                 });
 
                 // Sort by Date (Newest First)
-                flattenedOrders.sort((a, b) => 
+                flattenedOrders.sort((a, b) =>
                     new Date(b.date).getTime() - new Date(a.date).getTime()
                 );
-                
+
                 setOrders(flattenedOrders);
             } else {
                 setOrders([]);
@@ -86,10 +85,10 @@ export default function AdminOrders() {
     };
 
     const getStatusColor = (status: string) => {
-        switch(status) {
+        switch (status) {
             case "Processing": return "bg-yellow-100 text-yellow-700 border-yellow-200";
             case "Shipped": return "bg-blue-100 text-blue-700 border-blue-200";
-            case "OutForDelivery": return "bg-purple-100 text-purple-700 border-purple-200"; 
+            case "OutForDelivery": return "bg-purple-100 text-purple-700 border-purple-200";
             case "Delivered": return "bg-green-100 text-green-700 border-green-200";
             case "Cancelled": return "bg-red-100 text-red-700 border-red-200";
             default: return "bg-gray-100 text-gray-700";
@@ -100,8 +99,8 @@ export default function AdminOrders() {
         <div>
             <div className="flex justify-between items-center mb-6">
                 <h2 className="text-2xl md:text-3xl font-bold text-gray-800">Orders ({orders.length})</h2>
-                <button 
-                    onClick={fetchOrders} 
+                <button
+                    onClick={fetchOrders}
                     className="text-sm text-orange-600 font-semibold hover:underline flex items-center gap-1"
                 >
                     Refresh
@@ -118,7 +117,7 @@ export default function AdminOrders() {
                 <div className="grid gap-4">
                     {orders.map((order) => (
                         <div key={order.id} className="bg-white p-4 md:p-6 rounded-xl shadow-sm border border-gray-200 hover:shadow-md transition">
-                            
+
                             {/* --- Header: Name, ID, Date, Status --- */}
                             <div className="flex flex-col md:flex-row justify-between items-start mb-4 pb-4 border-b border-gray-100 gap-4">
                                 <div className="w-full md:w-auto">
@@ -129,12 +128,12 @@ export default function AdminOrders() {
                                         {/* Mobile Date (Hidden on Desktop) */}
                                         <span className="md:hidden text-[10px] text-gray-400">{new Date(order.date).toLocaleDateString()}</span>
                                     </div>
-                                    
+
                                     <p className="text-xs text-gray-500 font-mono mt-1 break-all">ID: {order.id}</p>
                                     {/* Desktop Date */}
                                     <p className="hidden md:block text-xs text-gray-400 mt-1">{new Date(order.date).toLocaleString()}</p>
                                 </div>
-                                
+
                                 <div className="w-full md:w-auto flex flex-col md:flex-row items-start md:items-center gap-3">
                                     {/* Status Badge */}
                                     <span className={`px-3 py-1.5 rounded-full text-xs font-bold border flex items-center gap-1 w-fit ${getStatusColor(order.status)}`}>
@@ -145,11 +144,11 @@ export default function AdminOrders() {
                                         {order.status === 'Cancelled' && <AlertCircle className="w-3 h-3" />}
                                         {order.status === 'OutForDelivery' ? 'Out For Delivery' : order.status}
                                     </span>
-                                    
+
                                     {/* Status Dropdown (Full width on mobile) */}
                                     <div className="relative w-full md:w-auto">
-                                        <select 
-                                            value={order.status} 
+                                        <select
+                                            value={order.status}
                                             onChange={(e) => updateStatus(order.userId, order.id, e.target.value)}
                                             className="w-full md:w-auto appearance-none bg-gray-50 border border-gray-300 text-gray-700 py-2 pl-3 pr-8 rounded-lg text-sm font-medium focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 cursor-pointer"
                                         >
@@ -185,7 +184,7 @@ export default function AdminOrders() {
                             <div className="text-xs text-gray-500 grid grid-cols-1 md:grid-cols-2 gap-4 bg-white pt-2">
                                 {/* Address Block */}
                                 <div className="p-3 border rounded-lg bg-white">
-                                    <p className="font-bold text-gray-800 mb-1 flex items-center gap-1"><MapPin className="w-3 h-3"/> Shipping Address</p>
+                                    <p className="font-bold text-gray-800 mb-1 flex items-center gap-1"><MapPin className="w-3 h-3" /> Shipping Address</p>
                                     <p>{order.shippingAddress?.street}</p>
                                     <p>{order.shippingAddress?.city}, {order.shippingAddress?.zip}</p>
                                     <p className="mt-1 text-gray-400">Phone: <span className="text-gray-700">{order.shippingAddress?.phone}</span></p>

@@ -5,13 +5,14 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { auth } from "@/lib/firebase";
 import { onAuthStateChanged, signOut } from "firebase/auth";
-import { Package, ShoppingCart, LogOut, Star, MessageSquare, Menu, X } from "lucide-react";
+import { Package, ShoppingCart, LogOut, Star, MessageSquare, Menu, X, LayoutGrid } from "lucide-react";
 
 // Import Components
 import AdminProducts from "./AdminProducts";
 import AdminOrders from "./AdminOrders";
 import AdminReviews from "./AdminReviews";
-import AdminSupport from "./AdminSupport"; 
+import AdminSupport from "./AdminSupport";
+import AdminExplore from "./AdminExplore"; // ✅ Ensure this file exists
 
 // ✅ SECURITY: List of allowed Admin Emails
 const ALLOWED_ADMINS = [
@@ -24,7 +25,7 @@ export default function AdminDashboard() {
     const [user, setUser] = useState<any>(null);
     const [activeTab, setActiveTab] = useState("products");
     const [loading, setLoading] = useState(true);
-    
+
     // Mobile Sidebar State
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
@@ -32,7 +33,7 @@ export default function AdminDashboard() {
         const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
             if (!currentUser) {
                 router.push("/admin-section/login");
-            } 
+            }
             // ✅ Check if email exists in the allowed array
             else if (!ALLOWED_ADMINS.includes(currentUser.email || "")) {
                 alert("Security Alert: Unauthorized Access.");
@@ -61,7 +62,7 @@ export default function AdminDashboard() {
 
     return (
         <div className="min-h-screen bg-gray-100 flex flex-col lg:flex-row">
-            
+
             {/* --- MOBILE HEADER (Visible only on small screens) --- */}
             <div className="lg:hidden bg-gray-900 text-white p-4 flex justify-between items-center sticky top-0 z-30 shadow-md">
                 <h1 className="text-xl font-bold text-orange-500">Modulae<span className="text-white text-xs ml-1 border px-1 rounded">HQ</span></h1>
@@ -72,7 +73,7 @@ export default function AdminDashboard() {
 
             {/* --- SIDEBAR OVERLAY (Mobile only) --- */}
             {isSidebarOpen && (
-                <div 
+                <div
                     className="fixed inset-0 bg-black/50 z-40 lg:hidden backdrop-blur-sm"
                     onClick={() => setIsSidebarOpen(false)}
                 ></div>
@@ -91,12 +92,12 @@ export default function AdminDashboard() {
                         <X className="w-6 h-6" />
                     </button>
                 </div>
-                
+
                 <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
                     <button onClick={() => handleTabChange("products")} className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${activeTab === 'products' ? 'bg-orange-600 text-white' : 'hover:bg-gray-800 text-gray-400'}`}>
                         <Package className="w-5 h-5" /> Products
                     </button>
-                    
+
                     <button onClick={() => handleTabChange("orders")} className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${activeTab === 'orders' ? 'bg-orange-600 text-white' : 'hover:bg-gray-800 text-gray-400'}`}>
                         <ShoppingCart className="w-5 h-5" /> Orders
                     </button>
@@ -107,6 +108,11 @@ export default function AdminDashboard() {
 
                     <button onClick={() => handleTabChange("support")} className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${activeTab === 'support' ? 'bg-orange-600 text-white' : 'hover:bg-gray-800 text-gray-400'}`}>
                         <MessageSquare className="w-5 h-5" /> Support
+                    </button>
+
+                    {/* ✅ FIXED: Using "explore" as the key to match render logic below */}
+                    <button onClick={() => handleTabChange("explore")} className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${activeTab === 'explore' ? 'bg-orange-600 text-white' : 'hover:bg-gray-800 text-gray-400'}`}>
+                        <LayoutGrid className="w-5 h-5" /> Explore Section
                     </button>
                 </nav>
 
@@ -124,6 +130,8 @@ export default function AdminDashboard() {
                 {activeTab === "orders" && <AdminOrders />}
                 {activeTab === "reviews" && <AdminReviews />}
                 {activeTab === "support" && <AdminSupport />}
+                {/* ✅ FIXED: Matching the "explore" key */}
+                {activeTab === "explore" && <AdminExplore />}
             </main>
         </div>
     );

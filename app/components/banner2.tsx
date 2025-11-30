@@ -11,7 +11,7 @@ const adDetails = {
   title: "Great Deals On",
   highlight: "Bathrooms",
   buttonText: "Explore Collection",
-  link: "#",
+  link: "/shop",
 };
 
 const Ad2 = () => {

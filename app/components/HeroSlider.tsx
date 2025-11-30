@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 "use client";
 
 import { useState, useEffect } from "react";
@@ -61,7 +62,7 @@ const HeroSlider = () => {
         <div
           key={slide.id}
           className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${
-            index === currentSlide ? "opacity-100 z-10" : "opacity-0 -z-0"
+            index === currentSlide ? "opacity-100 z-10" : "opacity-0 z-0"
           }`}
           style={{
             backgroundImage: `url(${slide.backgroundImage})`,
@@ -70,7 +71,7 @@ const HeroSlider = () => {
           }}
         >
           {/* Overlay content */}
-          <div className="absolute inset-0 flex items-center justify-start p-6 sm:p-12 md:p-16 lg:p-24 bg-gradient-to-r from-black/20 via-transparent to-transparent">
+          <div className="absolute inset-0 flex items-center justify-start p-6 sm:p-12 md:p-16 lg:p-24 bg-linear-to-r from-black/20 via-transparent to-transparent">
             <div className="text-white">
               {/* Category Text */}
               <h3 className="text-lg sm:text-xl md:text-3xl font-normal drop-shadow-md">

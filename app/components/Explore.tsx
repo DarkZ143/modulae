@@ -1,77 +1,116 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Image from "next/image";
-import Link from "next/link"; // Import Next.js Link
+import Link from "next/link";
+import { ref, get } from "firebase/database";
+import { rtdb } from "@/lib/firebase";
 
-// Updated Data with correct Links matching your Database categories
-const categories = [
-  {
-    name: "Chairs",
-    items: 9,
-    imageUrl: "/explore/chair.png",
-    altText: "A modern chair",
-    href: "/chairs", // changed key to 'href' for standard Next.js naming
-  },
-  {
-    name: "Dining",
-    items: 9,
-    imageUrl: "/explore/dinning.png",
-    altText: "A dining table and chairs",
-    href: "/dining",
-  },
-  {
-    name: "Furniture",
-    items: 24,
-    imageUrl: "/explore/furniture.png",
-    altText: "A bed with a headboard",
-    href: "/furniture",
-  },
-  {
-    name: "Lamps",
-    items: 16,
-    imageUrl: "/explore/lamp.png",
-    altText: "A floor lamp",
-    href: "/lamps",
-  },
-  {
-    name: "Shoe Racks",
-    items: 24,
-    imageUrl: "/explore/shoerack.png",
-    altText: "A wooden shoe rack",
-    href: "/shoe-racks",
-  },
-  {
-    name: "Sofa Sets",
-    items: 24,
-    imageUrl: "/explore/sofaset.png",
-    altText: "A grey sofa",
-    href: "/sofa-sets",
-  },
-  {
-    name: "Tables",
-    items: 24,
-    imageUrl: "/explore/table.png",
-    altText: "A wooden table",
-    href: "/dining", // Linking to dining since tables are usually there
-  },
-  {
-    name: "TV Units",
-    items: 11,
-    imageUrl: "/explore/tvunit.png",
-    altText: "A TV entertainment unit",
-    href: "/tv-units",
-  },
-  {
-    name: "Wardrobes",
-    items: 24,
-    imageUrl: "/explore/wardrobes.png",
-    altText: "A modern wardrobe",
-    href: "/wardrobes",
-  },
+// Fallback if DB is completely empty (first run)
+const DEFAULT_CATEGORIES = [
+  "chairs", "dining", "furniture", "kitchen",
+  "lamps", "shoe-racks", "sofa-sets", "tv-units", "wardrobes"
 ];
 
+interface CategoryData {
+  name: string;
+  items: number;
+  imageUrl: string;
+  altText: string;
+  href: string;
+}
+
 const Explore = () => {
+  const [categories, setCategories] = useState<CategoryData[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        // 1. Get list of active categories from Admin Settings
+        const settingsRef = ref(rtdb, 'settings/categories');
+        const settingsSnap = await get(settingsRef);
+        const categorySlugs: string[] = settingsSnap.exists()
+          ? settingsSnap.val()
+          : DEFAULT_CATEGORIES;
+
+        // 2. Get Admin Config (Visibility & Custom Images)
+        const configRef = ref(rtdb, 'settings/explore_config');
+        const configSnap = await get(configRef);
+        const config = configSnap.exists() ? configSnap.val() : {};
+
+        // 3. Build Data
+        const categoryPromises = categorySlugs.map(async (slug) => {
+          // Skip if hidden by admin
+          if (config[slug] && config[slug].visible === false) return null;
+
+          // Fetch products in this category to get Count + Auto Image
+          const catRef = ref(rtdb, `${slug}`);
+          const catSnap = await get(catRef);
+
+          let count = 0;
+          let displayImage = "/placeholder.png"; // Default fallback
+
+          if (catSnap.exists()) {
+            const data = catSnap.val();
+            const productKeys = Object.keys(data);
+            count = productKeys.length;
+
+            // Attempt to get the first product's image
+            const firstProduct = data[productKeys[0]];
+            if (firstProduct?.images && firstProduct.images.length > 0) {
+              displayImage = firstProduct.images[0];
+            } else if (firstProduct?.image) {
+              displayImage = firstProduct.image;
+            }
+          }
+
+          // ⚡ OVERRIDE: If Admin set a custom image, use that instead
+          if (config[slug] && config[slug].customImage) {
+            displayImage = config[slug].customImage;
+          }
+
+          return {
+            name: slug.replace(/-/g, " "), // "sofa-sets" -> "sofa sets"
+            items: count,
+            imageUrl: displayImage,
+            altText: slug,
+            href: `/${slug}`
+          };
+        });
+
+        // Wait for all fetches and filter out hidden (null) items
+        const resolvedCategories = (await Promise.all(categoryPromises)).filter(Boolean) as CategoryData[];
+        setCategories(resolvedCategories);
+
+      } catch (error) {
+        console.error("Error fetching categories:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCategories();
+  }, []);
+
+  if (loading) {
+    return (
+      <section className="w-full bg-white py-16">
+        <div className="max-w-7xl mx-auto px-4">
+          <div className="text-center mb-12 animate-pulse">
+            <div className="h-8 bg-gray-200 w-64 mx-auto rounded"></div>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-6">
+            {[...Array(5)].map((_, i) => (
+              <div key={i} className="h-40 bg-gray-100 rounded-lg animate-pulse"></div>
+            ))}
+          </div>
+        </div>
+      </section>
+    );
+  }
+
   return (
     <section className="w-full bg-white py-4 md:py-16">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -138,6 +177,7 @@ const Explore = () => {
                     absolute right-0 bottom-0
                     w-28 h-28
                     object-contain object-bottom-right
+                    rounded-xl
                     
                     /* DESKTOP ONLY ANIMATIONS */
                     md:w-32 md:h-32
@@ -147,7 +187,7 @@ const Explore = () => {
                   onError={(e) => {
                     const target = e.target as HTMLImageElement;
                     target.src =
-                      'https://placehold.co/200x200/F9F9F9/333?text=Image';
+                      'https://placehold.co/200x200/F9F9F9/333?text=No+Image';
                   }}
                   unoptimized
                 />
