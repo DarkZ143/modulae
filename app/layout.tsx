@@ -5,11 +5,15 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import GlobalRouteLoader from "./components/GlobalRouteLoader";
 import { AuthProvider } from "./context/AuthContext";
-import { Suspense } from "react"; // <-- Import Suspense
+import { Suspense } from "react";
 
-// --- [STEP 1] Import your new wrapper ---
-import LayoutWrapper from "./components/LayoutWrapper"; // <-- Make sure this path is correct!
+// --- Import your wrappers and components ---
+import LayoutWrapper from "./components/LayoutWrapper";
 import ChatBot from "./components/ChatBot";
+
+// ✅ IMPORT LOCATION CONTEXT & BAR
+import { LocationProvider } from "./context/LocationContext";
+import PincodeBar from "./components/PincodeBar";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -37,16 +41,23 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <AuthProvider>
-          {/* --- [STEP 2] Wrap your client components in Suspense --- */}
-          {/* Both GlobalRouteLoader and LayoutWrapper use client hooks,
-              so they must be wrapped in Suspense to avoid build errors. */}
+          {/* Suspense wraps client components to handle useSearchParams/usePathname */}
           <Suspense>
             <GlobalRouteLoader />
-            <LayoutWrapper>{children}
-              <ChatBot />
-            </LayoutWrapper>
-          </Suspense>
 
+            {/* ✅ Wrap everything in LocationProvider */}
+            <LocationProvider>
+              <LayoutWrapper>
+                {/* ✅ PincodeBar goes here so it appears just below the Navbar (rendered by LayoutWrapper) */}
+                <PincodeBar />
+
+                {children}
+
+                <ChatBot />
+              </LayoutWrapper>
+            </LocationProvider>
+
+          </Suspense>
         </AuthProvider>
       </body>
     </html>

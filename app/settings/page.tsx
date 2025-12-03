@@ -1,9 +1,9 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
-import TopOfferBar from "../components/TopOfferBar";
 import AccountSidebar from "../components/AccountSidebar";
 
 import { useAuth } from "../context/AuthContext";
@@ -97,7 +97,7 @@ export default function SettingsPage() {
 
     return (
         <>
-            <TopOfferBar />
+
             <Navbar />
 
             <div className="max-w-6xl mx-auto px-4 py-10 flex flex-col lg:flex-row gap-8">
@@ -271,14 +271,12 @@ function SettingToggle({
                     className="hidden"
                 />
                 <div
-                    className={`w-12 h-6 flex items-center bg-gray-300 rounded-full p-1 transition ${
-                        value ? "bg-orange-500" : ""
-                    }`}
+                    className={`w-12 h-6 flex items-center bg-gray-300 rounded-full p-1 transition ${value ? "bg-orange-500" : ""
+                        }`}
                 >
                     <div
-                        className={`bg-white w-5 h-5 rounded-full shadow transform transition ${
-                            value ? "translate-x-6" : ""
-                        }`}
+                        className={`bg-white w-5 h-5 rounded-full shadow transform transition ${value ? "translate-x-6" : ""
+                            }`}
                     ></div>
                 </div>
             </label>

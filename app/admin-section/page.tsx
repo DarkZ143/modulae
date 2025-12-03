@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { auth } from "@/lib/firebase";
 import { onAuthStateChanged, signOut } from "firebase/auth";
-import { Package, ShoppingCart, LogOut, Star, MessageSquare, Menu, X, LayoutGrid } from "lucide-react";
+import { Package, ShoppingCart, LogOut, Star, MessageSquare, Menu, X, LayoutGrid, Ticket, LayoutTemplate, ImageIcon, Megaphone } from "lucide-react";
 
 // Import Components
 import AdminProducts from "./AdminProducts";
@@ -13,6 +13,10 @@ import AdminOrders from "./AdminOrders";
 import AdminReviews from "./AdminReviews";
 import AdminSupport from "./AdminSupport";
 import AdminExplore from "./AdminExplore"; // ✅ Ensure this file exists
+import AdminVouchers from "./AdminVouchers";
+import AdminNavbar from "./AdminNavbar";
+import AdminHero from "./AdminHero";
+import AdminAds from "./AdminAds";
 
 // ✅ SECURITY: List of allowed Admin Emails
 const ALLOWED_ADMINS = [
@@ -114,6 +118,22 @@ export default function AdminDashboard() {
                     <button onClick={() => handleTabChange("explore")} className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${activeTab === 'explore' ? 'bg-orange-600 text-white' : 'hover:bg-gray-800 text-gray-400'}`}>
                         <LayoutGrid className="w-5 h-5" /> Explore Section
                     </button>
+
+                    <button onClick={() => handleTabChange("vouchers")} className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${activeTab === 'vouchers' ? 'bg-orange-600 text-white' : 'hover:bg-gray-800 text-gray-400'}`}>
+                        <Ticket className="w-5 h-5" /> Vouchers
+                    </button>
+
+                    <button onClick={() => handleTabChange("navbar")} className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${activeTab === 'navbar' ? 'bg-orange-600 text-white' : 'hover:bg-gray-800 text-gray-400'}`}>
+                        <LayoutTemplate className="w-5 h-5" /> Navbar Manager
+                    </button>
+
+                    <button onClick={() => handleTabChange("hero")} className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${activeTab === 'hero' ? 'bg-orange-600 text-white' : 'hover:bg-gray-800 text-gray-400'}`}>
+                        <ImageIcon className="w-5 h-5" /> Hero Slider
+                    </button>
+
+                    <button onClick={() => handleTabChange("ads")} className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${activeTab === 'ads' ? 'bg-orange-600 text-white' : 'hover:bg-gray-800 text-gray-400'}`}>
+                        <Megaphone className="w-5 h-5" /> Promo Ads
+                    </button>
                 </nav>
 
                 <div className="p-4 border-t border-gray-800 bg-gray-900">
@@ -132,6 +152,11 @@ export default function AdminDashboard() {
                 {activeTab === "support" && <AdminSupport />}
                 {/* ✅ FIXED: Matching the "explore" key */}
                 {activeTab === "explore" && <AdminExplore />}
+                {activeTab === "vouchers" && <AdminVouchers />} {/* ✅ Render Here */}
+                {activeTab === "navbar" && <AdminNavbar />} {/* ✅ Render */}
+                {activeTab === "hero" && <AdminHero />} {/* ✅ Render */}
+
+                {activeTab === "ads" && <AdminAds />} {/* ✅ Render Here */}
             </main>
         </div>
     );

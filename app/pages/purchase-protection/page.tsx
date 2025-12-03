@@ -1,6 +1,5 @@
 /* eslint-disable @next/next/no-html-link-for-pages */
 
-import TopOfferBar from "../../components/TopOfferBar";
 import Navbar from "../../components/Navbar";
 import LatestProducts from "../../components/LatestProduct";
 import BlogSection from "../../components/blog";
@@ -66,7 +65,7 @@ const outOfWarrantySteps = [
 export default function PurchaseProtectionPage() {
     return (
         <>
-            <TopOfferBar />
+            
             <Navbar />
 
             {/* ================== CATEGORY HEADER (TABS STYLE) ================== */}

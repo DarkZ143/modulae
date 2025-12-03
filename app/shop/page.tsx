@@ -2,159 +2,232 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Image from "next/image";
-import Link from "next/link";
 import { ref, get } from "firebase/database";
 import { rtdb } from "@/lib/firebase";
 
 // Components
 import Navbar from "@/app/components/Navbar";
 import Footer from "@/app/components/Footer";
-import TopOfferBar from "@/app/components/TopOfferBar";
 
-// List of all nodes in your Firebase
-const ALL_CATEGORIES = [
-    "products",
-    "chairs",
-    "dining",
-    "furniture",
-    "kitchen",
-    "lamps",
-    "shoe-racks",
-    "sofa-sets",
-    "tv-units",
-    "wardrobes"
-];
+import ProductCard from "@/app/components/ProductCard";
+import ShopSidebar from "@/app/components/ShopSidebar";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+
+const ITEMS_PER_PAGE = 20;
+const DEFAULT_CATEGORIES = ["products", "chairs", "dining", "furniture", "kitchen", "lamps", "shoe-racks", "sofa-sets", "tv-units", "wardrobes"];
 
 export default function AllProductsPage() {
+    // --- DATA STATES ---
     const [allItems, setAllItems] = useState<any[]>([]);
-    const [loading, setLoading] = useState(true);
+    const [filteredItems, setFilteredItems] = useState<any[]>([]);
+    const [paginatedItems, setPaginatedItems] = useState<any[]>([]);
 
+    // ✅ NEW: Stores category list WITH counts
+    const [categoryOptions, setCategoryOptions] = useState<{ slug: string, count: number }[]>([]);
+
+    const [loading, setLoading] = useState(true);
+    const [currentPage, setCurrentPage] = useState(1);
+
+    const [filters, setFilters] = useState({
+        category: "",
+        min: "",
+        max: "",
+        rating: 0
+    });
+
+    // 1. FETCH DATA (Categories & Products)
     useEffect(() => {
         const fetchEverything = async () => {
             try {
                 setLoading(true);
-                const promises = ALL_CATEGORIES.map((category) => {
-                    return get(ref(rtdb, `${category}/`));
-                });
 
-                // Wait for ALL categories to fetch
+                // A. Get Dynamic Categories from Admin Settings
+                const settingsRef = ref(rtdb, 'settings/categories');
+                const settingsSnap = await get(settingsRef);
+                const activeCategories = settingsSnap.exists() ? settingsSnap.val() : DEFAULT_CATEGORIES;
+
+                // B. Get Products from ALL active categories
+                const promises = activeCategories.map((category: string) => get(ref(rtdb, `${category}/`)));
                 const snapshots = await Promise.all(promises);
 
                 let combinedData: any[] = [];
+                const counts: Record<string, number> = {};
 
-                snapshots.forEach((snap) => {
+                // Initialize counts with 0 for all active categories
+                activeCategories.forEach((c: string) => counts[c] = 0);
+
+                snapshots.forEach((snap, index) => {
                     if (snap.exists()) {
                         const data = snap.val();
-                        // Convert object to array and push to master list
-                        const categoryItems = Object.keys(data).map((slug) => ({
+                        const categorySlug = activeCategories[index];
+
+                        const items = Object.keys(data).map((slug) => ({
                             slug,
+                            category: categorySlug, // Critical for filtering
                             ...data[slug],
                         }));
-                        combinedData = [...combinedData, ...categoryItems];
+
+                        // Update count
+                        counts[categorySlug] = items.length;
+                        combinedData = [...combinedData, ...items];
                     }
                 });
 
-                // Optional: Shuffle items so they don't look grouped by category
-                setAllItems(combinedData.sort(() => Math.random() - 0.5));
-                
+                // C. Set State
+                // Create array of objects for Sidebar: [{slug: 'chairs', count: 12}, ...]
+                const sidebarOptions = activeCategories.map((slug: string) => ({
+                    slug,
+                    count: counts[slug] || 0
+                }));
+                setCategoryOptions(sidebarOptions);
+
+                // Shuffle products for display
+                const shuffled = combinedData.sort(() => Math.random() - 0.5);
+                setAllItems(shuffled);
+                setFilteredItems(shuffled);
+
             } catch (error) {
-                console.error("Error fetching all products:", error);
+                console.error("Error fetching data:", error);
             } finally {
                 setLoading(false);
             }
         };
-
         fetchEverything();
     }, []);
 
+    // 2. FILTER LOGIC
+    useEffect(() => {
+        let result = [...allItems];
+
+        // Category Filter
+        if (filters.category) {
+            result = result.filter(item => item.category === filters.category);
+        }
+
+        // Price Filter
+        if (filters.min) {
+            result = result.filter(item => Number(item.price) >= Number(filters.min));
+        }
+        if (filters.max) {
+            result = result.filter(item => Number(item.price) <= Number(filters.max));
+        }
+
+        // Rating Filter
+        if (filters.rating > 0) {
+            result = result.filter(item => (item.rating || 0) >= filters.rating);
+        }
+
+        setFilteredItems(result);
+        setCurrentPage(1); // Reset to page 1
+    }, [filters, allItems]);
+
+    // 3. PAGINATION LOGIC
+    useEffect(() => {
+        const start = (currentPage - 1) * ITEMS_PER_PAGE;
+        const end = start + ITEMS_PER_PAGE;
+        setPaginatedItems(filteredItems.slice(start, end));
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }, [currentPage, filteredItems]);
+
+    const totalPages = Math.ceil(filteredItems.length / ITEMS_PER_PAGE);
+
     return (
         <>
-            <TopOfferBar />
+
             <Navbar />
 
-            <div className="bg-gray-50 min-h-screen py-10">
-                <div className="max-w-7xl mx-auto px-6">
-                    
-                    {/* Header */}
-                    <div className="text-center mb-12">
-                        <h1 className="text-4xl font-bold text-gray-900 mb-2">All Collections</h1>
-                        <p className="text-gray-500">Browsing {allItems.length} premium items</p>
-                        <div className="w-24 h-1 bg-orange-500 mx-auto mt-4 rounded-full"></div>
+            <div className="bg-gray-50 min-h-screen py-8">
+                <div className="max-w-[1600px] mx-auto px-4 sm:px-6 flex flex-col lg:flex-row gap-8">
+
+                    {/* --- SIDEBAR (Updated to receive categories with counts) --- */}
+                    <ShopSidebar
+                        categories={categoryOptions} // ✅ Passing dynamic list with counts
+                        filters={filters}
+                        setFilters={setFilters}
+                        clearFilters={() => setFilters({ category: "", min: "", max: "", rating: 0 })}
+                    />
+
+                    {/* --- MAIN CONTENT --- */}
+                    <div className="flex-1">
+
+                        {/* Header */}
+                        <div className="mb-6 flex justify-between items-center border-b border-gray-200 pb-4">
+                            <div>
+                                <h1 className="text-2xl font-bold text-gray-900">
+                                    {filters.category ? filters.category.replace(/-/g, ' ').toUpperCase() : "ALL PRODUCTS"}
+                                </h1>
+                                <p className="text-sm text-gray-500 mt-1">
+                                    Showing {paginatedItems.length} of {filteredItems.length} results
+                                </p>
+                            </div>
+                        </div>
+
+                        {/* Product Grid */}
+                        {loading ? (
+                            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
+                                {[...Array(8)].map((_, i) => (
+                                    <div key={i} className="h-[420px] bg-white rounded-md border border-gray-200 animate-pulse"></div>
+                                ))}
+                            </div>
+                        ) : paginatedItems.length === 0 ? (
+                            <div className="text-center py-20 bg-white rounded-lg border border-gray-200 shadow-sm">
+                                <p className="text-gray-500 text-lg">No products match your filters.</p>
+                                <button onClick={() => setFilters({ category: "", min: "", max: "", rating: 0 })} className="mt-3 text-orange-600 hover:underline font-semibold">Clear Filters</button>
+                            </div>
+                        ) : (
+                            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
+                                {paginatedItems.map((item, idx) => (
+                                    <ProductCard
+                                        key={`${item.slug}-${idx}`}
+                                        product={item}
+                                    />
+                                ))}
+                            </div>
+                        )}
+
+                        {/* --- PAGINATION --- */}
+                        {filteredItems.length > ITEMS_PER_PAGE && (
+                            <div className="flex justify-center items-center gap-2 mt-12">
+                                <button
+                                    onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                                    disabled={currentPage === 1}
+                                    className="p-2 border rounded-md hover:bg-white disabled:opacity-50 disabled:cursor-not-allowed bg-white shadow-sm"
+                                >
+                                    <ChevronLeft className="w-5 h-5" />
+                                </button>
+
+                                {[...Array(totalPages)].map((_, i) => {
+                                    const pageNum = i + 1;
+                                    if (pageNum === 1 || pageNum === totalPages || (pageNum >= currentPage - 1 && pageNum <= currentPage + 1)) {
+                                        return (
+                                            <button
+                                                key={pageNum}
+                                                onClick={() => setCurrentPage(pageNum)}
+                                                className={`w-10 h-10 rounded-md font-bold text-sm transition-all border ${currentPage === pageNum
+                                                    ? "bg-gray-800 text-white border-gray-800"
+                                                    : "bg-white text-gray-700 border-gray-300 hover:bg-gray-50"
+                                                    }`}
+                                            >
+                                                {pageNum}
+                                            </button>
+                                        );
+                                    } else if (pageNum === currentPage - 2 || pageNum === currentPage + 2) {
+                                        return <span key={pageNum} className="text-gray-400">...</span>;
+                                    }
+                                    return null;
+                                })}
+
+                                <button
+                                    onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                                    disabled={currentPage === totalPages}
+                                    className="p-2 border rounded-md hover:bg-white disabled:opacity-50 disabled:cursor-not-allowed bg-white shadow-sm"
+                                >
+                                    <ChevronRight className="w-5 h-5" />
+                                </button>
+                            </div>
+                        )}
+
                     </div>
-
-                    {/* Loading State */}
-                    {loading ? (
-                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                            {[...Array(8)].map((_, i) => (
-                                <div key={i} className="h-80 bg-gray-200 rounded-xl animate-pulse"></div>
-                            ))}
-                        </div>
-                    ) : (
-                        /* Products Grid */
-                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                            {allItems.map((item, idx) => {
-                                const offer = Math.round(((item.mrp - item.price) / item.mrp) * 100) || 0;
-
-                                return (
-                                    <Link 
-                                        key={`${item.slug}-${idx}`} 
-                                        href={`/products/${item.slug}`}
-                                        className="group block bg-white   rounded-xl overflow-hidden hover:shadow-xl hover:shadow-orange-200 transition-all duration-300"
-                                    >
-                                        {/* Image Container */}
-                                        <div className="relative w-full h-64 bg-gray-100 overflow-hidden">
-                                            <Image
-                                                src={item.images?.[0] || "/placeholder.png"}
-                                                alt={item.title}
-                                                fill
-                                                className="object-cover group-hover:scale-110 transition duration-500"
-                                            />
-                                            
-                                            {/* Offer Badge */}
-                                            {offer > 0 && (
-                                                <span className="absolute top-2 left-2 bg-red-600 text-white text-[10px] font-bold px-2 py-1 rounded uppercase tracking-wider">
-                                                    {offer}% OFF
-                                                </span>
-                                            )}
-
-                                            {/* Quick View Overlay (Optional Aesthetic) */}
-                                            <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-                                                <span className="bg-white text-gray-900 px-4 py-2 rounded-full text-sm font-semibold shadow-lg transform translate-y-4 group-hover:translate-y-0 transition duration-300">
-                                                    View Details
-                                                </span>
-                                            </div>
-                                        </div>
-
-                                        {/* Content */}
-                                        <div className="p-4">
-                                            <h3 className="font-bold text-gray-800 truncate mb-1" title={item.title}>
-                                                {item.title}
-                                            </h3>
-                                            
-                                            {/* Rating */}
-                                            <div className="flex items-center gap-1 text-xs text-gray-500 mb-3">
-                                                <span className="text-yellow-500">★</span>
-                                                <span>{item.rating || 4.5}</span>
-                                                <span>({item.reviews || 0})</span>
-                                            </div>
-
-                                            {/* Price */}
-                                            <div className="flex items-center justify-between">
-                                                <div>
-                                                    <span className="text-lg font-bold text-gray-900">₹{item.price}</span>
-                                                    <span className="text-sm text-gray-400 line-through ml-2">₹{item.mrp}</span>
-                                                </div>
-                                                <button className="w-8 h-8 bg-orange-100 text-orange-600 rounded-full flex items-center justify-center hover:bg-orange-500 hover:text-white transition">
-                                                    +
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </Link>
-                                );
-                            })}
-                        </div>
-                    )}
                 </div>
             </div>
             <Footer />

@@ -1,132 +1,111 @@
 /* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { useState, useEffect } from "react";
+import { ref, get } from "firebase/database";
+import { rtdb } from "@/lib/firebase";
+import Link from "next/link";
+import Image from "next/image";
 
-// Define the structure for each slide's data
-interface Slide {
-  id: number;
-  backgroundImage: string; // URL or path to the image
-  category: string;
-  mainHighlight: string;
-  discountPercentage: string;
-  shopNowLink: string;
-}
-
-const slides: Slide[] = [
-  {
-    id: 1,
-    backgroundImage: "/slider/img1.jpg", // Replace with your image URL
-    category: "Drawing Room",
-    mainHighlight: "Inoterior",
-    discountPercentage: "70%",
-    shopNowLink: "#",
-  },
-  {
-    id: 2,
-    backgroundImage: "/slider/img2.jpg", // Replace with your image URL
-    category: "Simple & Modern",
-    mainHighlight: "Furniture",
-    discountPercentage: "60%",
-    shopNowLink: "#",
-  },
-  {
-    id: 3,
-    backgroundImage: "/slider/img3.jpg", // Example third slide
-    category: "Stylish Comfort",
-    mainHighlight: "Living Space",
-    discountPercentage: "50%",
-    shopNowLink: "#",
-  },
+// Fallback placeholders so the site isn't empty on first load
+const DEFAULT_SLIDES = [
+  { id: 1, image: "/slider/img1.jpg", link: "/shop" },
+  { id: 2, image: "/slider/img2.jpg", link: "/collections/furniture" },
+  { id: 3, image: "/slider/img3.jpg", link: "/collections/chairs" },
 ];
 
 const HeroSlider = () => {
+  const [slides, setSlides] = useState<any[]>(DEFAULT_SLIDES);
   const [currentSlide, setCurrentSlide] = useState(0);
+  const [isClient, setIsClient] = useState(false);
 
-  // Automatic slide change
+  useEffect(() => {
+    setIsClient(true);
+    const fetchSlides = async () => {
+      try {
+        const snap = await get(ref(rtdb, "settings/hero_slider"));
+        if (snap.exists()) {
+          const data = snap.val();
+          if (Array.isArray(data) && data.length > 0) {
+            setSlides(data);
+          }
+        }
+      } catch (error) {
+        console.error("Error loading slider:", error);
+      }
+    };
+    fetchSlides();
+  }, []);
+
   useEffect(() => {
     const slideInterval = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % slides.length);
-    }, 5000); // Change slide every 5 seconds (5000ms)
-
-    return () => clearInterval(slideInterval); // Clean up on unmount
+    }, 5000);
+    return () => clearInterval(slideInterval);
   }, [slides.length]);
 
-  const goToSlide = (index: number) => {
-    setCurrentSlide(index);
-  };
+  if (!isClient) return null;
 
   return (
-    <div className="relative w-full h-[350px] sm:h-[450px] lg:h-[550px] overflow-hidden">
+    <div className="relative w-full h-[250px] sm:h-[350px] md:h-[450px] lg:h-[550px] overflow-hidden bg-gray-900 group">
+
+      {/* Slides */}
       {slides.map((slide, index) => (
         <div
           key={slide.id}
-          className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${
-            index === currentSlide ? "opacity-100 z-10" : "opacity-0 z-0"
-          }`}
-          style={{
-            backgroundImage: `url(${slide.backgroundImage})`,
-            backgroundSize: "cover",
-            backgroundPosition: "center",
-          }}
+          className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${index === currentSlide ? "opacity-100 z-10" : "opacity-0 z-0"
+            }`}
         >
-          {/* Overlay content */}
-          <div className="absolute inset-0 flex items-center justify-start p-6 sm:p-12 md:p-16 lg:p-24 bg-linear-to-r from-black/20 via-transparent to-transparent">
-            <div className="text-white">
-              {/* Category Text */}
-              <h3 className="text-lg sm:text-xl md:text-3xl font-normal drop-shadow-md">
-                {slide.category}
-              </h3>
+          {/* Background Image */}
+          {slide.image && (
+            <Image
+              src={slide.image}
+              alt="Hero Banner"
+              fill
+              className="object-cover"
+              priority={index === 0} // Prioritize first image
+            />
+          )}
 
-              {/* Main Highlight Text */}
-              <h2 className="text-3xl sm:text-5xl md:text-7xl lg:text-8xl font-bold my-3 sm:my-4 md:my-6 inline-block bg-orange-500 py-1 px-3 sm:py-2 sm:px-4 leading-tight drop-shadow-lg">
-                {slide.mainHighlight}
-              </h2>
+          {/* Overlay (Darkens slightly to make button pop) */}
+          <div className="absolute inset-0 bg-black/10"></div>
 
-              {/* Discount Section */}
-              <div className="flex items-end mt-4">
-                <span className="text-xs sm:text-sm font-bold uppercase block -rotate-90 origin-bottom-left whitespace-nowrap bg-black text-white px-2 py-1 mb-1 sm:mb-2 -ml-1 sm:ml-0">
-                  Up To
-                </span>
-                <span className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-bold leading-none drop-shadow-lg ml-2">
-                  {slide.discountPercentage}
-                </span>
-                <span className="text-lg sm:text-2xl md:text-4xl lg:text-5xl font-semibold ml-2 sm:ml-4 mb-1 sm:mb-2 drop-shadow-md leading-tight">
-                  Off
-                  <br />
-                  Everything
-                </span>
-              </div>
-
-              {/* Button Container */}
-              <div className="flex gap-4 mt-6 sm:mt-8 md:mt-12">
-                <a
-                  href={slide.shopNowLink}
-                  className="bg-white hover:bg-gray-100 text-gray-800 font-semibold py-2 px-4 text-xs sm:py-3 sm:px-6 sm:text-sm md:text-base rounded-md transition-colors border border-gray-300"
-                >
-                  SHOP NOW
-                </a>
-              </div>
-            </div>
+          {/* ✅ ONLY SHOP NOW BUTTON (Centered) */}
+          <div className="absolute inset-0 flex items-center justify-center z-20">
+            <Link
+              href={slide.link || "/shop"}
+              className="
+                    bg-white text-gray-900 
+                    font-bold py-3 px-8 rounded-full 
+                    shadow-xl border-2 border-white
+                    transform transition-all duration-300
+                    hover:scale-110 hover:bg-gray-100 hover:shadow-2xl
+                    flex items-center gap-2
+                    animate-fade-in-up
+                  "
+            >
+              SHOP NOW
+            </Link>
           </div>
         </div>
       ))}
 
       {/* Navigation Dots */}
-      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex space-x-2 z-20">
+      <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex space-x-3 z-30">
         {slides.map((_, index) => (
           <button
             key={index}
-            onClick={() => goToSlide(index)}
-            className={`w-3 h-3 rounded-full transition-colors duration-300 ${
-              index === currentSlide
-                ? "bg-orange-500"
-                : "bg-gray-400 hover:bg-gray-300"
-            }`}
+            onClick={() => setCurrentSlide(index)}
+            className={`h-2 rounded-full transition-all duration-300 shadow-sm ${index === currentSlide
+                ? "bg-orange-500 w-8"
+                : "bg-white/60 hover:bg-white w-2"
+              }`}
             aria-label={`Go to slide ${index + 1}`}
           ></button>
         ))}
       </div>
+
     </div>
   );
 };

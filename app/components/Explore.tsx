@@ -4,12 +4,12 @@
 import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { ref, get } from "firebase/database";
+import { ref, get, query, limitToFirst } from "firebase/database";
 import { rtdb } from "@/lib/firebase";
 
 // Fallback if DB is completely empty (first run)
 const DEFAULT_CATEGORIES = [
-  "chairs", "dining", "furniture", "kitchen",
+  "chairs", "dining", "furniture", "kitchen", 
   "lamps", "shoe-racks", "sofa-sets", "tv-units", "wardrobes"
 ];
 
@@ -31,9 +31,10 @@ const Explore = () => {
         // 1. Get list of active categories from Admin Settings
         const settingsRef = ref(rtdb, 'settings/categories');
         const settingsSnap = await get(settingsRef);
-        const categorySlugs: string[] = settingsSnap.exists()
-          ? settingsSnap.val()
-          : DEFAULT_CATEGORIES;
+        
+        const categorySlugs: string[] = settingsSnap.exists() 
+            ? settingsSnap.val() 
+            : DEFAULT_CATEGORIES;
 
         // 2. Get Admin Config (Visibility & Custom Images)
         const configRef = ref(rtdb, 'settings/explore_config');
@@ -42,42 +43,50 @@ const Explore = () => {
 
         // 3. Build Data
         const categoryPromises = categorySlugs.map(async (slug) => {
-          // Skip if hidden by admin
-          if (config[slug] && config[slug].visible === false) return null;
+            // Skip if hidden by admin
+            if (config[slug] && config[slug].visible === false) return null;
 
-          // Fetch products in this category to get Count + Auto Image
-          const catRef = ref(rtdb, `${slug}`);
-          const catSnap = await get(catRef);
+            let displayImage = "https://placehold.co/200x200/F9F9F9/333?text=No+Image"; 
+            let count = 0;
 
-          let count = 0;
-          let displayImage = "/placeholder.png"; // Default fallback
+            // A. Check Admin Custom Image FIRST
+            if (config[slug] && config[slug].customImage) {
+                displayImage = config[slug].customImage;
+                
+                // Fetch just the count (optimizable)
+                const catRef = ref(rtdb, `${slug}`);
+                const catSnap = await get(catRef);
+                if (catSnap.exists()) count = Object.keys(catSnap.val()).length;
 
-          if (catSnap.exists()) {
-            const data = catSnap.val();
-            const productKeys = Object.keys(data);
-            count = productKeys.length;
-
-            // Attempt to get the first product's image
-            const firstProduct = data[productKeys[0]];
-            if (firstProduct?.images && firstProduct.images.length > 0) {
-              displayImage = firstProduct.images[0];
-            } else if (firstProduct?.image) {
-              displayImage = firstProduct.image;
+            } else {
+                // B. Auto-Fetch from First Product if no custom image
+                const q = query(ref(rtdb, `${slug}`), limitToFirst(1));
+                const catSnap = await get(q); // Quick fetch for image
+                
+                // We need full node for accurate count
+                const fullSnap = await get(ref(rtdb, `${slug}`)); 
+                
+                if (fullSnap.exists()) {
+                    const data = fullSnap.val();
+                    const productKeys = Object.keys(data);
+                    count = productKeys.length;
+                    
+                    const firstProduct = data[productKeys[0]];
+                    if (firstProduct?.images && firstProduct.images.length > 0) {
+                        displayImage = firstProduct.images[0];
+                    } else if (firstProduct?.image) {
+                        displayImage = firstProduct.image;
+                    }
+                }
             }
-          }
 
-          // ⚡ OVERRIDE: If Admin set a custom image, use that instead
-          if (config[slug] && config[slug].customImage) {
-            displayImage = config[slug].customImage;
-          }
-
-          return {
-            name: slug.replace(/-/g, " "), // "sofa-sets" -> "sofa sets"
-            items: count,
-            imageUrl: displayImage,
-            altText: slug,
-            href: `/${slug}`
-          };
+            return {
+                name: slug.replace(/-/g, " "), // "sofa-sets" -> "sofa sets"
+                items: count,
+                imageUrl: displayImage,
+                altText: slug,
+                href: `/${slug}`
+            };
         });
 
         // Wait for all fetches and filter out hidden (null) items
@@ -99,7 +108,7 @@ const Explore = () => {
       <section className="w-full bg-white py-16">
         <div className="max-w-7xl mx-auto px-4">
           <div className="text-center mb-12 animate-pulse">
-            <div className="h-8 bg-gray-200 w-64 mx-auto rounded"></div>
+             <div className="h-8 bg-gray-200 w-64 mx-auto rounded"></div>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-6">
             {[...Array(5)].map((_, i) => (
@@ -140,16 +149,16 @@ const Explore = () => {
                     {category.name}
                   </h3>
 
-                  {/* This container will hold either the item count or "Shop Now" */}
+                  {/* This container will hold either the item count or "Buy now" */}
                   <div className="relative h-6 mt-1">
                     {/* Item count - visible by default, fades out */}
                     <p className="absolute top-0 left-0 text-sm text-gray-600 transition-opacity duration-300 ease-in-out group-hover:opacity-0">
                       ({category.items} Items)
                     </p>
 
-                    {/* Shop Now - hidden by default, fades in */}
+                    {/* Buy now - hidden by default, fades in */}
                     <span className="absolute top-0 left-0 text-sm font-semibold text-orange-500 flex items-center gap-1 transition-opacity duration-300 ease-in-out opacity-0 group-hover:opacity-100">
-                      Shop Now
+                      Buy now
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
                         className="h-4 w-4"
@@ -186,8 +195,7 @@ const Explore = () => {
                   "
                   onError={(e) => {
                     const target = e.target as HTMLImageElement;
-                    target.src =
-                      'https://placehold.co/200x200/F9F9F9/333?text=No+Image';
+                    target.src = 'https://placehold.co/200x200/F9F9F9/333?text=No+Image';
                   }}
                   unoptimized
                 />

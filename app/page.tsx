@@ -15,7 +15,7 @@ import Footer from './components/Footer'
 const Home = () => {
   return (
     <div>
-      <TopOfferBar />
+      
       <Navbar />
       <HeroSlider />
       <Explore />

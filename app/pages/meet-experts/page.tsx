@@ -1,6 +1,6 @@
 "use client";
 
-import TopOfferBar from "../../components/TopOfferBar";
+
 import Navbar from "../../components/Navbar";
 import Footer from "../../components/Footer";
 import Image from "next/image";
@@ -99,7 +99,7 @@ const experts = [
 export default function MeetExpertsPage() {
     return (
         <>
-            <TopOfferBar />
+            
             <Navbar />
             <CategoryHeader title="Meet Experts" />
 

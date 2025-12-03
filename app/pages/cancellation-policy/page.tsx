@@ -2,12 +2,12 @@
 
 import Navbar from "@/app/components/Navbar";
 import Footer from "@/app/components/Footer";
-import TopOfferBar from "@/app/components/TopOfferBar";
+
 
 export default function Page() {
     return (
         <>
-            <TopOfferBar />
+          
             <Navbar />
 
             <div className="max-w-5xl mx-auto px-6 py-10">

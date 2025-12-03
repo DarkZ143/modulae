@@ -1,138 +1,121 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import TopOfferBar from "../../components/TopOfferBar";
-import Navbar from "../../components/Navbar";
-import Footer from "../../components/Footer";
-import LatestProducts from "../../components/LatestProduct";
-import BlogSection from "../../components/blog";
-import Image from "next/image";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import Navbar from "@/app/components/Navbar";
+import Footer from "@/app/components/Footer";
 import CategoryHeader from "@/app/components/CategoryHeader";
+import { ref, get } from "firebase/database";
+import { rtdb } from "@/lib/firebase";
+import Image from "next/image";
+import { Ticket } from "lucide-react";
 
-const vouchers = [
-    {
-        title: "₹500 Cashback Voucher",
-        image: "/vouchers/cashbacks.png",
-        desc: "Get flat ₹500 cashback on your next purchase above ₹2,999. Valid for all furniture categories.",
-        tag: "Cashback Offer",
-        color: "from-orange-500 to-red-500",
-    },
-    {
-        title: "Zomato Food Voucher",
-        image: "/vouchers/zomato.png",
-        desc: "Enjoy delicious meals with a ₹300 Zomato food gift card. Perfect for family and friends.",
-        tag: "Food & Dining",
-        color: "from-red-500 to-pink-500",
-    },
-    {
-        title: "Swiggy Money Voucher",
-        image: "/vouchers/swiggy.png",
-        desc: "Get a ₹250 Swiggy Money voucher on every furniture order above ₹5,000.",
-        tag: "Food Delivery",
-        color: "from-yellow-500 to-orange-500",
-    },
-    {
-        title: "Amazon Shopping Voucher",
-        image: "/vouchers/amazon.png",
-        desc: "Shop electronics, fashion, appliances, and more with this ₹500 Amazon shopping gift card.",
-        tag: "E-Commerce",
-        color: "from-indigo-500 to-purple-500",
-    },
-    {
-        title: "MakeMyTrip Travel Voucher",
-        image: "/vouchers/makemytrip.png",
-        desc: "₹1,000 off on flights, hotels, and holiday bookings through MakeMyTrip.",
-        tag: "Travel & Hotels",
-        color: "from-blue-500 to-cyan-500",
-    },
-    {
-        title: "Myntra Fashion Voucher",
-        image: "/vouchers/myntra.png",
-        desc: "₹400 Myntra fashion voucher for clothing, shoes, accessories, and more.",
-        tag: "Fashion & Lifestyle",
-        color: "from-pink-500 to-purple-500",
-    },
-    {
-        title: "Gift Card – Modulae Store",
-        image: "/vouchers/giftcard.png",
-        desc: "Send love with a Modulae Gift Card. Redeemable on all furniture items in-store and online.",
-        tag: "Store Voucher",
-        color: "from-orange-600 to-yellow-500",
-    },
-    {
-        title: "Flipkart SuperCard",
-        image: "/vouchers/flipkart.png",
-        desc: "₹300 Flipkart SuperCard usable across millions of products online.",
-        tag: "Shopping",
-        color: "from-blue-600 to-blue-400",
-    },
-];
+// ✅ Helper to truncate description
+const truncateWords = (text: string, limit: number) => {
+    if (!text) return "";
+    const words = text.split(/\s+/);
+    if (words.length > limit) {
+        return words.slice(0, limit).join(" ") + "...";
+    }
+    return text;
+};
 
 export default function GiftVouchersPage() {
+    const [vouchers, setVouchers] = useState<any[]>([]);
+    const [loading, setLoading] = useState(true);
+    const router = useRouter();
+
+    useEffect(() => {
+        const fetchVouchers = async () => {
+            try {
+                const snap = await get(ref(rtdb, "vouchers"));
+                if (snap.exists()) {
+                    const data = snap.val();
+                    setVouchers(Object.values(data));
+                }
+            } catch (error) {
+                console.error(error);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchVouchers();
+    }, []);
+
+    const handleGetVoucher = (voucher: any) => {
+        localStorage.setItem("activeVoucher", JSON.stringify(voucher));
+        alert(`Voucher Applied! Add items worth ₹${voucher.minSpend} to use it.`);
+        router.push("/shop");
+    };
+
     return (
         <>
-            <TopOfferBar />
             <Navbar />
             <CategoryHeader title="Gift Vouchers" />
 
-            <div className="max-w-7xl mx-auto px-6 py-12">
-                {/* PAGE TITLE */}
-                <h1 className="text-4xl md:text-5xl font-bold text-gray-900 text-center">
-                    Exclusive <span className="text-orange-600 underline decoration-orange-400">Gift Vouchers</span>
-                </h1>
+            <div className="bg-gray-50 min-h-screen py-12">
+                <div className="max-w-7xl mx-auto px-6">
+                    <div className="text-center mb-12">
+                        <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+                            Exclusive <span className="text-orange-600 underline decoration-orange-400">Offers</span>
+                        </h1>
+                        <p className="text-gray-600 text-lg max-w-2xl mx-auto">
+                            Unlock special discounts and partner offers. Click &quot;Get Voucher&quot; to start shopping.
+                        </p>
+                    </div>
 
-                <p className="text-center text-gray-600 mt-3 text-lg max-w-2xl mx-auto">
-                    Choose from our curated list of vouchers — perfect for gifting and personal rewards.
-                </p>
-
-                {/* VOUCHER GRID */}
-                <div className="mt-12 grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
-                    {vouchers.map((card, index) => (
-                        <div
-                            key={index}
-                            className="
-                                bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition
-                                border border-gray-100
-                            "
-                        >
-                            {/* Gradient Top Section */}
-                            <div className={`p-6 bg-linear-to-r ${card.color} text-white`}>
-                                <h3 className="text-xl font-bold">{card.title}</h3>
-                                <p className="text-sm opacity-90 mt-1">{card.tag}</p>
-                            </div>
-
-                            {/* IMAGE */}
-                            <div className="p-6 flex justify-center">
-                                <Image
-                                    src={card.image}
-                                    alt={card.title}
-                                    width={160}
-                                    height={120}
-                                    className="object-contain drop-shadow-lg"
-                                />
-                            </div>
-
-                            {/* DESCRIPTION */}
-                            <div className="px-6 pb-6">
-                                <p className="text-gray-700 text-sm leading-relaxed">
-                                    {card.desc}
-                                </p>
-
-                                <button
-                                    className="
-                                        mt-4 w-full bg-orange-600 text-white py-2.5 rounded-lg
-                                        font-semibold hover:bg-orange-700 transition
-                                    "
-                                >
-                                    Get Voucher
-                                </button>
-                            </div>
+                    {loading ? (
+                        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                            {[...Array(3)].map((_, i) => (
+                                <div key={i} className="h-72 bg-gray-200 rounded-2xl animate-pulse"></div>
+                            ))}
                         </div>
-                    ))}
+                    ) : vouchers.length === 0 ? (
+                        <div className="text-center py-20 text-gray-500">No vouchers available right now.</div>
+                    ) : (
+                        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                            {vouchers.map((card, index) => (
+                                <div key={index} className="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition border border-gray-100 group flex flex-col">
+
+                                    <div className={`h-32 bg-linear-to-r ${card.color || "from-gray-700 to-gray-900"} p-6 text-white relative`}>
+                                        <h3 className="text-xl font-bold truncate pr-4">{card.title}</h3>
+                                        <p className="text-sm opacity-90 mt-1 font-medium">{card.tag}</p>
+                                        {card.minSpend > 0 && (
+                                            <span className="absolute top-4 right-4 bg-white/20 backdrop-blur-md text-xs px-2 py-1 rounded font-mono">
+                                                Min: ₹{card.minSpend}
+                                            </span>
+                                        )}
+                                    </div>
+
+                                    <div className="px-6 pb-6 flex-1 flex flex-col relative pt-12">
+                                        <div className="absolute -top-10 left-1/2 -translate-x-1/2 w-20 h-20 bg-white rounded-full shadow-md flex items-center justify-center overflow-hidden border-4 border-white z-10">
+                                            {card.image ? (
+                                                <Image src={card.image} alt={card.title} width={80} height={80} className="object-cover w-full h-full" />
+                                            ) : (
+                                                <Ticket className="w-8 h-8 text-gray-400" />
+                                            )}
+                                        </div>
+
+                                        {/* ✅ Applied truncation and ensured padding */}
+                                        <p className="text-gray-700 text-sm leading-relaxed text-center mb-4 flex-1 px-2">
+                                            {truncateWords(card.desc, 30)}
+                                        </p>
+
+                                        <button
+                                            onClick={() => handleGetVoucher(card)}
+                                            className="w-full bg-orange-600 text-white py-3 rounded-lg font-bold hover:bg-orange-700 transition shadow-md active:scale-95"
+                                        >
+                                            Get Voucher
+                                        </button>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    )}
                 </div>
             </div>
 
-            <LatestProducts />
-            <BlogSection />
             <Footer />
         </>
     );

@@ -2,7 +2,7 @@
 
 import Navbar from "@/app/components/Navbar";
 import Footer from "@/app/components/Footer";
-import TopOfferBar from "@/app/components/TopOfferBar";
+
 
 export default function PrivacyPolicyPage() {
   const currentDate = new Date().toLocaleDateString("en-US", {
@@ -13,12 +13,12 @@ export default function PrivacyPolicyPage() {
 
   return (
     <>
-      <TopOfferBar />
+
       <Navbar />
 
       <div className="bg-gray-50 min-h-screen">
         <div className="max-w-4xl mx-auto px-6 py-16">
-          
+
           {/* Header */}
           <div className="mb-12 text-center">
             <h1 className="text-4xl font-extrabold text-gray-900 mb-4">
@@ -31,16 +31,16 @@ export default function PrivacyPolicyPage() {
 
           {/* Content Container */}
           <div className="bg-white shadow-sm rounded-xl p-8 md:p-12 border border-gray-100 space-y-10 text-gray-700 leading-relaxed">
-            
+
             {/* 1. Introduction */}
             <section>
               <h2 className="text-2xl font-bold text-gray-900 mb-4">
                 1. Introduction
               </h2>
               <p>
-                Welcome to <strong>Modulae</strong>. We value the trust you place in us. 
-                This Privacy Policy describes how we collect, use, and disclose your personal 
-                information when you visit our website or make a purchase. By using our services, 
+                Welcome to <strong>Modulae</strong>. We value the trust you place in us.
+                This Privacy Policy describes how we collect, use, and disclose your personal
+                information when you visit our website or make a purchase. By using our services,
                 you agree to the collection and use of information in accordance with this policy.
               </p>
             </section>
@@ -51,21 +51,21 @@ export default function PrivacyPolicyPage() {
                 2. Information We Collect
               </h2>
               <p className="mb-4">
-                When you visit Modulae, we collect certain information about your device, 
+                When you visit Modulae, we collect certain information about your device,
                 your interaction with the site, and information necessary to process your purchases.
               </p>
-              
+
               <ul className="list-disc pl-6 space-y-2 mt-4">
                 <li>
-                  <strong>Personal Identification:</strong> Name, email address, phone number, 
+                  <strong>Personal Identification:</strong> Name, email address, phone number,
                   shipping address, and billing address.
                 </li>
                 <li>
-                  <strong>Payment Information:</strong> Credit card numbers or payment account details 
+                  <strong>Payment Information:</strong> Credit card numbers or payment account details
                   (processed securely by our third-party payment providers).
                 </li>
                 <li>
-                  <strong>Technical Data:</strong> IP address, browser type, time zone settings, 
+                  <strong>Technical Data:</strong> IP address, browser type, time zone settings,
                   and device information.
                 </li>
               </ul>
@@ -91,9 +91,9 @@ export default function PrivacyPolicyPage() {
                 4. Cookies & Tracking
               </h2>
               <p>
-                We use cookies to enhance your browsing experience. Cookies are small files stored on your 
-                device that help us remember your preferences and shopping cart contents. You can choose 
-                to disable cookies through your browser settings, though this may affect your ability to 
+                We use cookies to enhance your browsing experience. Cookies are small files stored on your
+                device that help us remember your preferences and shopping cart contents. You can choose
+                to disable cookies through your browser settings, though this may affect your ability to
                 use certain features of our site.
               </p>
             </section>
@@ -104,9 +104,9 @@ export default function PrivacyPolicyPage() {
                 5. Data Security
               </h2>
               <p>
-                We implement industry-standard security measures to protect your personal information. 
-                All payment transactions are encrypted using Secure Socket Layer (SSL) technology. 
-                However, no method of transmission over the Internet is 100% secure, so we cannot 
+                We implement industry-standard security measures to protect your personal information.
+                All payment transactions are encrypted using Secure Socket Layer (SSL) technology.
+                However, no method of transmission over the Internet is 100% secure, so we cannot
                 guarantee absolute security.
               </p>
             </section>
@@ -117,9 +117,9 @@ export default function PrivacyPolicyPage() {
                 6. Third-Party Disclosure
               </h2>
               <p>
-                We do not sell, trade, or otherwise transfer your personally identifiable information 
-                to outside parties. This does not include trusted third parties who assist us in 
-                operating our website (e.g., shipping partners, payment gateways), so long as those 
+                We do not sell, trade, or otherwise transfer your personally identifiable information
+                to outside parties. This does not include trusted third parties who assist us in
+                operating our website (e.g., shipping partners, payment gateways), so long as those
                 parties agree to keep this information confidential.
               </p>
             </section>
@@ -130,8 +130,8 @@ export default function PrivacyPolicyPage() {
                 7. Your Rights
               </h2>
               <p>
-                Depending on your location, you may have the right to access the personal information 
-                we hold about you, port it to a new service, or ask that your personal information 
+                Depending on your location, you may have the right to access the personal information
+                we hold about you, port it to a new service, or ask that your personal information
                 be corrected, updated, or erased. Please contact us if you wish to exercise these rights.
               </p>
             </section>

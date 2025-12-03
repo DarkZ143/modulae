@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import TopOfferBar from "../../components/TopOfferBar";
+
 import Navbar from "../../components/Navbar";
 import Footer from "../../components/Footer";
 import LatestProducts from "../../components/LatestProduct";
@@ -50,7 +50,7 @@ const brands = [
 export default function BrandsPage() {
     return (
         <>
-            <TopOfferBar />
+            
             <Navbar />
             <CategoryHeader title="Brands" />
 

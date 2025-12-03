@@ -1,5 +1,5 @@
 import React from 'react'
-import TopOfferBar from '../../components/TopOfferBar'
+
 import Navbar from '../../components/Navbar'
 import CategoryHeader from '../../components/CategoryHeader'
 import LatestProducts from '../../components/LatestProduct'
@@ -11,7 +11,7 @@ import BlogSection from '@/app/components/blog'
 const About = () => {
   return (
     <div>
-      <TopOfferBar />
+
       <Navbar />
       <CategoryHeader title="About Us" />
       <AboutCompany />

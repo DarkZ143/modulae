@@ -12,7 +12,7 @@ import type { Product } from "@/types/product";
 import Footer from "@/app/components/Footer";
 import Navbar from "@/app/components/Navbar";
 import HurryUp from "@/app/components/hurryup";
-import TopOfferBar from "@/app/components/TopOfferBar";
+
 import { Star, CheckCircle, User, Calendar } from "lucide-react";
 
 // Fallback list
@@ -140,7 +140,7 @@ export default function ProductPage() {
 
     return (
         <>
-            <TopOfferBar />
+
             <Navbar />
 
             <div className="bg-gray-50 py-10">

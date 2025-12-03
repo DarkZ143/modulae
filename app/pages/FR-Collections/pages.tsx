@@ -2,7 +2,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import TopOfferBar from "../../components/TopOfferBar";
+
 import Navbar from "../../components/Navbar";
 import Footer from "../../components/Footer";
 import LatestProducts from "../../components/LatestProduct";
@@ -98,7 +98,7 @@ export default function FRCollectionsPage() {
 
     return (
         <>
-            <TopOfferBar />
+            
             <Navbar />
 
             {/* Page Header */}

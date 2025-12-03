@@ -9,7 +9,7 @@ import { ref, onValue } from "firebase/database";
 
 import Navbar from "@/app/components/Navbar";
 import Footer from "@/app/components/Footer";
-import TopOfferBar from "@/app/components/TopOfferBar";
+
 import LatestProducts from "@/app/components/LatestProduct";
 import BlogSection from "@/app/components/blog";
 import Link from "next/link"; // Added Link for navigation
@@ -69,7 +69,7 @@ export default function DashboardPage() {
 
     return (
         <>
-            <TopOfferBar />
+
             <Navbar />
 
             <div className="min-h-screen bg-gray-100 px-6 py-10">

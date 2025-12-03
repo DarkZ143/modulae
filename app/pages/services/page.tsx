@@ -1,6 +1,6 @@
 "use client";
 
-import TopOfferBar from "../../components/TopOfferBar";
+
 import Navbar from "../../components/Navbar";
 import Footer from "../../components/Footer";
 import LatestProducts from "../../components/LatestProduct";
@@ -11,7 +11,7 @@ import CategoryHeader from "@/app/components/CategoryHeader";
 export default function ServicesPage() {
     return (
         <>
-            <TopOfferBar />
+            
             <Navbar />
             <CategoryHeader title="Services" />
 

@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, Calendar, User, X } from "lucide-react";
-import TopOfferBar from "@/app/components/TopOfferBar";
+
 import Navbar from "@/app/components/Navbar";
 import CategoryHeader from "@/app/components/CategoryHeader";
 import LatestProducts from "@/app/components/LatestProduct";
@@ -94,7 +94,7 @@ const FurnitureMagazine = () => {
 
     return (
         <>
-            <TopOfferBar />
+            
             <Navbar />
             <CategoryHeader title="Furniture Magazine" />
             

@@ -1,6 +1,6 @@
 "use client";
 
-import TopOfferBar from "../../components/TopOfferBar";
+
 import Navbar from "../../components/Navbar";
 import Footer from "../../components/Footer";
 import LatestProducts from "../../components/LatestProduct";
@@ -78,7 +78,7 @@ const workCultureItems = [
 export default function GalleryPage() {
     return (
         <>
-            <TopOfferBar />
+            
             <Navbar />
             <CategoryHeader title="Gallery" />
 

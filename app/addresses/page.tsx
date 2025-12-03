@@ -4,7 +4,7 @@
 
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
-import TopOfferBar from "../components/TopOfferBar";
+
 import AccountSidebar from "../components/AccountSidebar";
 
 import { useAuth } from "../context/AuthContext";
@@ -99,7 +99,7 @@ export default function AddressesPage() {
 
     return (
         <>
-            <TopOfferBar />
+            
             <Navbar />
 
             <div className="max-w-6xl mx-auto px-4 py-10 flex flex-col lg:flex-row gap-8">
