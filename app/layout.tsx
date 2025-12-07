@@ -1,7 +1,7 @@
 // app/layout.tsx
 
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Inter } from "next/font/google";
 import "./globals.css";
 import GlobalRouteLoader from "./components/GlobalRouteLoader";
 import { AuthProvider } from "./context/AuthContext";
@@ -15,13 +15,9 @@ import ChatBot from "./components/ChatBot";
 import { LocationProvider } from "./context/LocationContext";
 import PincodeBar from "./components/PincodeBar";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+// ✅ STABLE FONT FOR NEXT 14
+const inter = Inter({
+  variable: "--font-inter",
   subsets: ["latin"],
 });
 
@@ -37,9 +33,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
+      <body className={`${inter.variable} antialiased`}>
         <AuthProvider>
           {/* Suspense wraps client components to handle useSearchParams/usePathname */}
           <Suspense>
@@ -56,7 +50,6 @@ export default function RootLayout({
                 <ChatBot />
               </LayoutWrapper>
             </LocationProvider>
-
           </Suspense>
         </AuthProvider>
       </body>

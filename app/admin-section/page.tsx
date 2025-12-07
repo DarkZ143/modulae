@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { auth } from "@/lib/firebase";
 import { onAuthStateChanged, signOut } from "firebase/auth";
-import { Package, ShoppingCart, LogOut, Star, MessageSquare, Menu, X, LayoutGrid, Ticket, LayoutTemplate, ImageIcon, Megaphone } from "lucide-react";
+import { Package, ShoppingCart, LogOut, Star, MessageSquare, Menu, X, LayoutGrid, Ticket, LayoutTemplate, ImageIcon, Megaphone, Monitor, ScrollText, Users, PanelBottom, Mail, HelpCircle, ShieldCheck, UserCheck, Images, Briefcase, BookOpen } from "lucide-react";
 
 // Import Components
 import AdminProducts from "./AdminProducts";
@@ -17,6 +17,18 @@ import AdminVouchers from "./AdminVouchers";
 import AdminNavbar from "./AdminNavbar";
 import AdminHero from "./AdminHero";
 import AdminAds from "./AdminAds";
+import AdminAd2 from "./AdminAd2";
+import AdminMarquee from "./AdminMarquee";
+import AdminClients from "./AdminClients";
+import AdminFooter from "./AdminFooter";
+import AdminNewsletter from "./AdminNewsletter";
+import AdminFAQ from "./AdminFAQ";
+import AdminPurchaseProtection from "./AdminPurchaseProtection";
+import AdminExperts from "./AdminExperts";
+import AdminGallery from "./AdminGallery";
+import AdminBrands from "./AdminBrands";
+import AdminMagazine from "./AdminMagazine";
+import AdminBlog from "./AdminBlog";
 
 // ✅ SECURITY: List of allowed Admin Emails
 const ALLOWED_ADMINS = [
@@ -134,6 +146,54 @@ export default function AdminDashboard() {
                     <button onClick={() => handleTabChange("ads")} className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${activeTab === 'ads' ? 'bg-orange-600 text-white' : 'hover:bg-gray-800 text-gray-400'}`}>
                         <Megaphone className="w-5 h-5" /> Promo Ads
                     </button>
+
+                    <button onClick={() => handleTabChange("big-banner")} className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${activeTab === 'big-banner' ? 'bg-orange-600 text-white' : 'hover:bg-gray-800 text-gray-400'}`}>
+                        <Monitor className="w-5 h-5" /> Big Banner
+                    </button>
+
+                    <button onClick={() => handleTabChange("marquee")} className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${activeTab === 'marquee' ? 'bg-orange-600 text-white' : 'hover:bg-gray-800 text-gray-400'}`}>
+                        <ScrollText className="w-5 h-5" /> Marquee Ad
+                    </button>
+
+                    <button onClick={() => handleTabChange("clients")} className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${activeTab === 'clients' ? 'bg-orange-600 text-white' : 'hover:bg-gray-800 text-gray-400'}`}>
+                        <Users className="w-5 h-5" /> Partners / Clients
+                    </button>
+
+                    <button onClick={() => handleTabChange("footer")} className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${activeTab === 'footer' ? 'bg-orange-600 text-white' : 'hover:bg-gray-800 text-gray-400'}`}>
+                        <PanelBottom className="w-5 h-5" /> Footer
+                    </button>
+
+                    <button onClick={() => handleTabChange("newsletter")} className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-lg transition-colors ${activeTab === 'newsletter' ? 'bg-orange-600 text-white' : 'hover:bg-gray-800 text-gray-400'}`}>
+                        <Mail className="w-5 h-5" /> Newsletter
+                    </button>
+
+                    <button onClick={() => handleTabChange("faq")} className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${activeTab === 'faq' ? 'bg-orange-600 text-white' : 'hover:bg-gray-800 text-gray-400'}`}>
+                        <HelpCircle className="w-5 h-5" /> FAQs
+                    </button>
+
+                    <button onClick={() => handleTabChange("protection")} className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${activeTab === 'protection' ? 'bg-orange-600 text-white' : 'hover:bg-gray-800 text-gray-400'}`}>
+                        <ShieldCheck className="w-5 h-5" /> Purchase Protection
+                    </button>
+
+                    <button onClick={() => handleTabChange("experts")} className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${activeTab === 'experts' ? 'bg-orange-600 text-white' : 'hover:bg-gray-800 text-gray-400'}`}>
+                        <UserCheck className="w-5 h-5" /> Experts
+                    </button>
+
+                    <button onClick={() => handleTabChange("gallery")} className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${activeTab === 'gallery' ? 'bg-orange-600 text-white' : 'hover:bg-gray-800 text-gray-400'}`}>
+                        <Images className="w-5 h-5" /> Gallery
+                    </button>
+
+                    <button onClick={() => handleTabChange("brands")} className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${activeTab === 'brands' ? 'bg-orange-600 text-white' : 'hover:bg-gray-800 text-gray-400'}`}>
+                        <Briefcase className="w-5 h-5" /> Brands
+                    </button>
+
+                    <button onClick={() => handleTabChange("magazine")} className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${activeTab === 'magazine' ? 'bg-orange-600 text-white' : 'hover:bg-gray-800 text-gray-400'}`}>
+                        <BookOpen className="w-5 h-5" /> Magazine
+                    </button>
+
+                    <button onClick={() => handleTabChange("blog")} className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${activeTab === 'blog' ? 'bg-orange-600 text-white' : 'hover:bg-gray-800 text-gray-400'}`}>
+                        <BookOpen className="w-5 h-5" /> Blog
+                    </button>
                 </nav>
 
                 <div className="p-4 border-t border-gray-800 bg-gray-900">
@@ -157,6 +217,21 @@ export default function AdminDashboard() {
                 {activeTab === "hero" && <AdminHero />} {/* ✅ Render */}
 
                 {activeTab === "ads" && <AdminAds />} {/* ✅ Render Here */}
+                {activeTab === "big-banner" && <AdminAd2 />} {/* ✅ Render Here */}
+
+
+                {activeTab === "marquee" && <AdminMarquee />} {/* ✅ Render Here */}
+                {activeTab === "clients" && <AdminClients />} {/* ✅ Render Here */}
+
+                {activeTab === "footer" && <AdminFooter />} {/* ✅ Render Here */}
+                {activeTab === "newsletter" && <AdminNewsletter />}
+                {activeTab === "faq" && <AdminFAQ />} {/* ✅ Render Here */}
+                {activeTab === "protection" && <AdminPurchaseProtection />} {/* ✅ Render Here */}
+                {activeTab === "experts" && <AdminExperts />} {/* ✅ Render Here */}
+                {activeTab === "gallery" && <AdminGallery />} {/* ✅ Render Here */}
+                {activeTab === "brands" && <AdminBrands />} {/* ✅ Render Here */}
+                {activeTab === "magazine" && <AdminMagazine />} {/* ✅ Render Here */}
+                {activeTab === "blog" && <AdminBlog />} {/* ✅ Render */}
             </main>
         </div>
     );

@@ -262,7 +262,7 @@ const Navbar = () => {
       </div>
 
       {/* --- NAVBAR MAIN --- */}
-      <nav className="w-full bg-white border-b">
+      <nav className="w-full bg-white border-xl border-orange-500 shadow-sm z-50">
         <div className="max-w-7xl mx-auto px-6 py-4 md:py-6 flex justify-between items-center">
           {/* Logo */}
           <div className="flex items-center gap-3">
