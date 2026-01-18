@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable react-hooks/set-state-in-effect */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
@@ -10,16 +11,21 @@ import { rtdb } from "@/lib/firebase";
 // Components
 import Navbar from "@/app/components/Navbar";
 import Footer from "@/app/components/Footer";
-
 import ProductCard from "@/app/components/ProductCard";
 import ShopSidebar from "@/app/components/ShopSidebar";
-import { ChevronLeft, ChevronRight, AlertCircle } from "lucide-react";
+import { ChevronLeft, ChevronRight, AlertCircle, Loader2 } from "lucide-react";
 
 const ITEMS_PER_PAGE = 20;
-const DEFAULT_CATEGORIES = ["products", "chairs", "dining", "furniture", "kitchen", "lamps", "shoe-racks", "sofa-sets", "tv-units", "wardrobes"];
+
+// Fallback Categories
+const DEFAULT_CATEGORIES = [
+    "products", "chairs", "dining", "furniture", "kitchen",
+    "lamps", "shoe-racks", "sofa-sets", "tv-units", "wardrobes"
+];
 
 export default function DynamicCategoryPage() {
     const params = useParams();
+    // Decode URL param (e.g. "sofa-sets")
     const categoryParam = params?.category as string;
 
     // --- DATA STATES ---
@@ -35,30 +41,33 @@ export default function DynamicCategoryPage() {
     const [currentPage, setCurrentPage] = useState(1);
 
     // --- FILTER STATE ---
+    // Initialize category from URL
     const [filters, setFilters] = useState({
-        category: categoryParam || "", // Initialize with URL category
+        category: categoryParam || "", // Start with URL category
         min: "",
         max: "",
         rating: 0
     });
 
-    // 1. FETCH EVERYTHING (To populate Sidebar Counts + Allow switching)
+    // 1. FETCH ALL DATA (To populate Sidebar & Allow switching)
     useEffect(() => {
         const fetchData = async () => {
             try {
                 setLoading(true);
 
-                // A. Get Categories
+                // A. Get Categories List
                 const settingsRef = ref(rtdb, 'settings/categories');
                 const settingsSnap = await get(settingsRef);
                 const activeCategories = settingsSnap.exists() ? settingsSnap.val() : DEFAULT_CATEGORIES;
 
-                // B. Get Products
+                // B. Fetch Products from ALL categories (for accurate sidebar counts)
                 const promises = activeCategories.map((cat: string) => get(ref(rtdb, `${cat}/`)));
                 const snapshots = await Promise.all(promises);
 
                 let combinedData: any[] = [];
                 const counts: Record<string, number> = {};
+
+                // Initialize counts
                 activeCategories.forEach((c: string) => counts[c] = 0);
 
                 snapshots.forEach((snap, index) => {
@@ -77,22 +86,22 @@ export default function DynamicCategoryPage() {
                     }
                 });
 
-                // C. Update State
-                const sidebarOptions = activeCategories.map((slug: string) => ({
+                // C. Update Sidebar Options
+                const sidebarOps = activeCategories.map((slug: string) => ({
                     slug,
                     count: counts[slug] || 0
                 }));
-                setCategoryOptions(sidebarOptions);
+                setCategoryOptions(sidebarOps);
 
-                // Shuffle
+                // D. Set Data & Shuffle
                 const shuffled = combinedData.sort(() => Math.random() - 0.5);
                 setAllItems(shuffled);
 
-                // Trigger initial filter
-                setLoading(false);
+                // Trigger Initial Filter is handled by the useEffect below
 
             } catch (err) {
                 console.error("Firebase Error:", err);
+            } finally {
                 setLoading(false);
             }
         };
@@ -100,13 +109,13 @@ export default function DynamicCategoryPage() {
         fetchData();
     }, []);
 
-    // 2. FILTER LOGIC (Runs when filters or data changes)
+    // 2. FILTER LOGIC
     useEffect(() => {
         if (allItems.length === 0) return;
 
         let result = [...allItems];
 
-        // Category Filter
+        // Category Filter (Crucial: Filters by the URL param or Sidebar selection)
         if (filters.category) {
             result = result.filter(item => item.category === filters.category);
         }
@@ -149,16 +158,18 @@ export default function DynamicCategoryPage() {
 
             <Navbar />
 
-            <div className="bg-gray-50 min-h-screen py-8">
+            <div className="bg-orange-50 min-h-screen py-8">
                 <div className="max-w-[1600px] mx-auto px-4 sm:px-6 flex flex-col lg:flex-row gap-8">
 
-                    {/* --- SIDEBAR --- */}
-                    <ShopSidebar
-                        categories={categoryOptions}
-                        filters={filters}
-                        setFilters={setFilters}
-                        clearFilters={() => setFilters({ category: "", min: "", max: "", rating: 0 })}
-                    />
+                    {/* --- SIDEBAR (Sticky Wrapper) --- */}
+                    <div className="lg:w-64 shrink-0 lg:sticky lg:top-4 h-fit">
+                        <ShopSidebar
+                            categories={categoryOptions}
+                            filters={filters}
+                            setFilters={setFilters}
+                            clearFilters={() => setFilters({ category: categoryParam, min: "", max: "", rating: 0 })}
+                        />
+                    </div>
 
                     {/* --- MAIN CONTENT --- */}
                     <div className="flex-1">
@@ -183,14 +194,14 @@ export default function DynamicCategoryPage() {
                                 <AlertCircle className="w-10 h-10 text-gray-300 mx-auto mb-3" />
                                 <p className="text-gray-500 text-lg">No products match your selected filters.</p>
                                 <button
-                                    onClick={() => setFilters({ category: "", min: "", max: "", rating: 0 })}
+                                    onClick={() => setFilters({ category: categoryParam, min: "", max: "", rating: 0 })}
                                     className="mt-3 text-orange-600 hover:underline font-semibold"
                                 >
                                     Clear Filters
                                 </button>
                             </div>
                         ) : (
-                            /* ✅ PRODUCT GRID */
+                            /* ✅ PRODUCT GRID USING AMAZON CARD */
                             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
                                 {paginatedItems.map((item, idx) => (
                                     <ProductCard
@@ -212,26 +223,10 @@ export default function DynamicCategoryPage() {
                                     <ChevronLeft className="w-5 h-5" />
                                 </button>
 
-                                {[...Array(totalPages)].map((_, i) => {
-                                    const pageNum = i + 1;
-                                    if (pageNum === 1 || pageNum === totalPages || (pageNum >= currentPage - 1 && pageNum <= currentPage + 1)) {
-                                        return (
-                                            <button
-                                                key={pageNum}
-                                                onClick={() => setCurrentPage(pageNum)}
-                                                className={`w-10 h-10 rounded-md font-bold text-sm transition-all border ${currentPage === pageNum
-                                                    ? "bg-gray-800 text-white border-gray-800"
-                                                    : "bg-white text-gray-700 border-gray-300 hover:bg-gray-50"
-                                                    }`}
-                                            >
-                                                {pageNum}
-                                            </button>
-                                        );
-                                    } else if (pageNum === currentPage - 2 || pageNum === currentPage + 2) {
-                                        return <span key={pageNum} className="text-gray-400">...</span>;
-                                    }
-                                    return null;
-                                })}
+                                {/* Page Numbers */}
+                                <span className="text-sm font-medium px-4">
+                                    Page {currentPage} of {totalPages}
+                                </span>
 
                                 <button
                                     onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}

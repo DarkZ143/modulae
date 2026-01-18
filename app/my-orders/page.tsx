@@ -12,7 +12,6 @@ import { onAuthStateChanged } from "firebase/auth";
 
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
-import TopOfferBar from "../components/TopOfferBar";
 import AccountSidebar from "../components/AccountSidebar";
 import { Package, ChevronRight } from "lucide-react";
 import LatestProducts from "../components/LatestProduct";
@@ -73,12 +72,27 @@ export default function MyOrdersPage() {
 
     return (
         <>
-            <TopOfferBar />
+
             <Navbar />
 
             <div className="max-w-6xl mx-auto px-4 py-10 flex flex-col lg:flex-row gap-8 min-h-[60vh]">
 
-                <AccountSidebar />
+
+                {/* LEFT SIDEBAR */}
+                <aside className="bg-white p-6 shadow-lg rounded-xl border-gray-400space-y-6 h-fit lg:sticky lg:top-28">
+                    <div>
+                        <h2 className="text-xl font-bold text-gray-800">My Account</h2>
+                        <p className="text-sm text-gray-500 mt-1 truncate">{user.email}</p>
+                    </div>
+
+                    <nav className="space-y-2 text-gray-700">
+                        <Link href="/profile" className="block p-3 rounded-lg  hover:bg-gray-100 transition" >Dashboard</Link>
+                        <Link href="/my-orders" className="block p-3 rounded-lg bg-orange-100 text-orange-600 font-semibold">My Orders</Link>
+                        <Link href="/wishlist" className="block p-3 rounded-lg hover:bg-gray-100 transition">Wishlist</Link>
+                        <Link href="/addresses" className="block p-3 rounded-lg hover:bg-gray-100 transition">Saved Addresses</Link>
+                        <Link href="/settings" className="block p-3 rounded-lg hover:bg-gray-100 transition">Settings</Link>
+                    </nav>
+                </aside>
 
                 <div className="flex-1 bg-white rounded-xl shadow-sm p-6 border border-gray-200">
                     <h2 className="text-2xl font-bold mb-6 text-gray-800">My Orders</h2>
@@ -110,9 +124,9 @@ export default function MyOrdersPage() {
                                             <div className="flex items-center gap-3 mb-1">
                                                 <h3 className="font-bold text-gray-900">Order <span className="font-mono text-sm bg-gray-100 px-2 py-1 rounded">{order.id}</span></h3>
                                                 <span className={`text-xs font-bold px-2 py-1 rounded-full uppercase tracking-wide ${order.status === "Delivered" ? "bg-green-100 text-green-700" :
-                                                        order.status === "Processing" ? "bg-yellow-100 text-yellow-700" :
-                                                            order.status === "Cancelled" ? "bg-red-100 text-red-700" :
-                                                                "bg-blue-100 text-blue-700"
+                                                    order.status === "Processing" ? "bg-yellow-100 text-yellow-700" :
+                                                        order.status === "Cancelled" ? "bg-red-100 text-red-700" :
+                                                            "bg-blue-100 text-blue-700"
                                                     }`}>
                                                     {order.status}
                                                 </span>

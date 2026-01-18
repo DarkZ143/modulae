@@ -12,7 +12,7 @@ import Navbar from "@/app/components/Navbar";
 import Footer from "@/app/components/Footer";
 import HurryUp from "@/app/components/hurryup";
 
-import AmazonProductPage from "@/app/components/AmazonProductPage";
+import FlipkartProductPage from "@/app/components/FlipkartProductPage";
 
 // ✅ SAME FALLBACK CATEGORIES
 const DEFAULT_CATEGORIES = [
@@ -41,11 +41,8 @@ export default function ProductPage() {
     const [qty, setQty] = useState(0);
     const [showToast, setShowToast] = useState(false);
 
-    // ✅ IMAGE STATE
-    const [selectedImg, setSelectedImg] = useState<string | null>(null);
-
     // ✅ ADD / UPDATE CART IN RTDB
-    const addToFirebaseCart = async (newQty = qty) => {
+    const addToFirebaseCart = async (newQty: number) => {
         const user = auth.currentUser;
         if (!user || !product) return false;
 
@@ -74,25 +71,6 @@ export default function ProductPage() {
         setTimeout(() => setShowToast(false), 2000);
     };
 
-    // ✅ INCREASE QTY
-    const increaseQty = async () => {
-        const user = auth.currentUser;
-        if (!user) return router.push("/auth/login");
-
-        const newQty = qty + 1;
-        setQty(newQty);
-        await addToFirebaseCart(newQty);
-    };
-
-    // ✅ DECREASE QTY
-    const decreaseQty = async () => {
-        if (qty <= 1) return;
-
-        const newQty = qty - 1;
-        setQty(newQty);
-        await addToFirebaseCart(newQty);
-    };
-
     // ✅ BUY NOW
     const handleBuyNow = async () => {
         const user = auth.currentUser;
@@ -102,14 +80,13 @@ export default function ProductPage() {
         router.push("/checkout");
     };
 
-    // ✅ ✅ ✅ SAME WORKING PRODUCT FETCH LOGIC
+    // ✅ PRODUCT FETCH (UNCHANGED – SAFE)
     useEffect(() => {
         if (!slug) return;
 
         const fetchProduct = async () => {
             try {
                 setLoading(true);
-
                 let foundData: any = null;
 
                 const settingsRef = ref(rtdb, "settings/categories");
@@ -131,9 +108,8 @@ export default function ProductPage() {
 
                 if (foundData) {
                     setProduct(foundData);
-                    setSelectedImg(foundData.images?.[0] ?? null);
 
-                    // ✅ LOAD REVIEWS
+                    // ✅ REVIEWS (FIREBASE)
                     if (foundData.user_reviews) {
                         const reviewsArray = Object.values(foundData.user_reviews).sort(
                             (a: any, b: any) =>
@@ -179,25 +155,21 @@ export default function ProductPage() {
         );
     }
 
-    // ✅ ✅ ✅ FINAL RENDER
+    // ✅ FINAL RENDER
     return (
         <>
             <Navbar />
 
-            <AmazonProductPage
-                product={product}
-                slug={slug}
-                selectedImg={selectedImg}
-                setSelectedImg={setSelectedImg}
-                handleAddToCart={handleAddToCart}
-                handleBuyNow={handleBuyNow}
-                increaseQty={increaseQty}
-                decreaseQty={decreaseQty}
-                qty={qty}
+            <FlipkartProductPage
+                product={{
+                    ...product,
+                    onAddToCart: handleAddToCart,
+                    onBuyNow: handleBuyNow,
+                }}
                 reviews={reviews}
             />
 
-            {/* ✅ TOAST MESSAGE */}
+            {/* ✅ TOAST */}
             {showToast && (
                 <div className="fixed top-24 right-5 bg-green-600 text-white px-6 py-3 rounded-lg shadow-xl z-50">
                     ✅ Added to Cart

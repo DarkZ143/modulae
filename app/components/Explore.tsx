@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
@@ -6,10 +7,11 @@ import Image from "next/image";
 import Link from "next/link";
 import { ref, get, query, limitToFirst } from "firebase/database";
 import { rtdb } from "@/lib/firebase";
+import { ArrowRight } from "lucide-react";
 
-// Fallback if DB is completely empty (first run)
+// Fallback if DB is completely empty
 const DEFAULT_CATEGORIES = [
-  "chairs", "dining", "furniture", "kitchen", 
+  "chairs", "dining", "furniture", "kitchen",
   "lamps", "shoe-racks", "sofa-sets", "tv-units", "wardrobes"
 ];
 
@@ -28,68 +30,57 @@ const Explore = () => {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
+        setLoading(true);
         // 1. Get list of active categories from Admin Settings
         const settingsRef = ref(rtdb, 'settings/categories');
         const settingsSnap = await get(settingsRef);
-        
-        const categorySlugs: string[] = settingsSnap.exists() 
-            ? settingsSnap.val() 
-            : DEFAULT_CATEGORIES;
+        const categorySlugs: string[] = settingsSnap.exists()
+          ? settingsSnap.val()
+          : DEFAULT_CATEGORIES;
 
-        // 2. Get Admin Config (Visibility & Custom Images)
+        // 2. Get Admin Config
         const configRef = ref(rtdb, 'settings/explore_config');
         const configSnap = await get(configRef);
         const config = configSnap.exists() ? configSnap.val() : {};
 
         // 3. Build Data
         const categoryPromises = categorySlugs.map(async (slug) => {
-            // Skip if hidden by admin
-            if (config[slug] && config[slug].visible === false) return null;
+          if (config[slug] && config[slug].visible === false) return null;
 
-            let displayImage = "https://placehold.co/200x200/F9F9F9/333?text=No+Image"; 
-            let count = 0;
+          let displayImage = "/placeholder.png";
+          let count = 0;
 
-            // A. Check Admin Custom Image FIRST
-            if (config[slug] && config[slug].customImage) {
-                displayImage = config[slug].customImage;
-                
-                // Fetch just the count (optimizable)
-                const catRef = ref(rtdb, `${slug}`);
-                const catSnap = await get(catRef);
-                if (catSnap.exists()) count = Object.keys(catSnap.val()).length;
+          if (config[slug] && config[slug].customImage) {
+            displayImage = config[slug].customImage;
+            const catRef = ref(rtdb, `${slug}`);
+            const catSnap = await get(catRef);
+            if (catSnap.exists()) count = Object.keys(catSnap.val()).length;
+          } else {
+            const q = query(ref(rtdb, `${slug}`), limitToFirst(1));
+            const catSnap = await get(q);
 
-            } else {
-                // B. Auto-Fetch from First Product if no custom image
-                const q = query(ref(rtdb, `${slug}`), limitToFirst(1));
-                const catSnap = await get(q); // Quick fetch for image
-                
-                // We need full node for accurate count
-                const fullSnap = await get(ref(rtdb, `${slug}`)); 
-                
-                if (fullSnap.exists()) {
-                    const data = fullSnap.val();
-                    const productKeys = Object.keys(data);
-                    count = productKeys.length;
-                    
-                    const firstProduct = data[productKeys[0]];
-                    if (firstProduct?.images && firstProduct.images.length > 0) {
-                        displayImage = firstProduct.images[0];
-                    } else if (firstProduct?.image) {
-                        displayImage = firstProduct.image;
-                    }
-                }
+            const fullSnap = await get(ref(rtdb, `${slug}`));
+            if (fullSnap.exists()) {
+              const data = fullSnap.val();
+              count = Object.keys(data).length;
+              const firstProduct = data[Object.keys(data)[0]];
+              if (firstProduct?.images && firstProduct.images.length > 0) {
+                displayImage = firstProduct.images[0];
+              } else if (firstProduct?.image) {
+                displayImage = firstProduct.image;
+              }
             }
+          }
 
-            return {
-                name: slug.replace(/-/g, " "), // "sofa-sets" -> "sofa sets"
-                items: count,
-                imageUrl: displayImage,
-                altText: slug,
-                href: `/${slug}`
-            };
+          return {
+            name: slug.replace(/-/g, " "),
+            items: count,
+            imageUrl: displayImage,
+            altText: slug,
+            href: `/${slug}`
+          };
         });
 
-        // Wait for all fetches and filter out hidden (null) items
         const resolvedCategories = (await Promise.all(categoryPromises)).filter(Boolean) as CategoryData[];
         setCategories(resolvedCategories);
 
@@ -107,12 +98,9 @@ const Explore = () => {
     return (
       <section className="w-full bg-white py-16">
         <div className="max-w-7xl mx-auto px-4">
-          <div className="text-center mb-12 animate-pulse">
-             <div className="h-8 bg-gray-200 w-64 mx-auto rounded"></div>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-6">
-            {[...Array(5)].map((_, i) => (
-              <div key={i} className="h-40 bg-gray-100 rounded-lg animate-pulse"></div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
+            {[...Array(4)].map((_, i) => (
+              <div key={i} className="h-[300px] bg-gray-100 rounded-xl animate-pulse"></div>
             ))}
           </div>
         </div>
@@ -121,84 +109,70 @@ const Explore = () => {
   }
 
   return (
-    <section className="w-full bg-white py-4 md:py-16">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Section Title */}
+    <section className="w-full bg-gray-50 py-12 md:py-16">
+      <div className="max-w-[1500px] mx-auto px-4 sm:px-6 lg:px-8">
+
         <div className="text-center mb-12">
-          <h2 className="text-3xl md:text-4xl font-bold text-gray-900">
-            Explore Our{" "}
-            <span className="border-b-4 border-orange-500 pb-1">
-              Furniture
-            </span>
+          <h2 className="text-3xl md:text-4xl font-bold text-gray-700">
+            Explore <span className="text-orange-600 border-b-4 border-orange-500 pb-1">Categories</span>
           </h2>
         </div>
 
-        {/* Categories Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
           {categories.map((category) => (
             <Link
               key={category.name}
               href={category.href}
-              className="group relative block bg-orange-50 rounded-lg shadow-sm overflow-hidden transition-all duration-1000 ease-in-out hover:shadow-lg"
+              className="
+                group relative block 
+                bg-orange-100 border border-gray-200 
+                rounded-2xl overflow-hidden 
+                h-80 
+                hover:shadow-xl hover:shadow-orange-100 
+                transition-all duration-300
+              "
             >
-              {/* Card content */}
-              <div className="relative h-36 md:h-40 p-5">
-                {/* Text Content */}
-                <div className="relative z-10">
-                  <h3 className="font-bold text-lg md:text-xl text-gray-900 capitalize">
-                    {category.name}
-                  </h3>
+              {/* --- TOP SECTION: TEXT (Fixed) --- */}
+              <div className="absolute top-0 left-0 w-full p-6 text-center z-10 bg-linear-to-b from-white/80 to-transparent">
+                <h3 className="font-bold text-xl text-gray-700 capitalize mb-1">
+                  {category.name}
+                </h3>
 
-                  {/* This container will hold either the item count or "Buy now" */}
-                  <div className="relative h-6 mt-1">
-                    {/* Item count - visible by default, fades out */}
-                    <p className="absolute top-0 left-0 text-sm text-gray-600 transition-opacity duration-300 ease-in-out group-hover:opacity-0">
-                      ({category.items} Items)
-                    </p>
-
-                    {/* Buy now - hidden by default, fades in */}
-                    <span className="absolute top-0 left-0 text-sm font-semibold text-orange-500 flex items-center gap-1 transition-opacity duration-300 ease-in-out opacity-0 group-hover:opacity-100">
-                      Buy now
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="h-4 w-4"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          d="M17 8l4 4m0 0l-4 4m4-4H3"
-                        />
-                      </svg>
-                    </span>
-                  </div>
+                <div className="flex items-center justify-center gap-1 text-sm font-semibold text-orange-600 transition-colors">
+                  <span>Shop Now</span>
+                  <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
                 </div>
 
-                <Image
-                  src={category.imageUrl}
-                  alt={category.altText}
-                  width={128}
-                  height={128}
-                  className="
-                    absolute right-0 bottom-0
-                    w-28 h-28
-                    object-contain object-bottom-right
-                    rounded-xl
+                <p className="text-xs text-gray-400 mt-1 font-medium">{category.items} Items</p>
+              </div>
+
+              {/* --- BOTTOM SECTION: IMAGE (Animates Up) --- */}
+              <div className="absolute bottom-0 left-0 w-full h-[220px] flex items-end justify-center">
+                <div className="
+                    relative w-[80%] h-[90%] 
+                    transition-transform duration-500 ease-out transform 
                     
-                    /* DESKTOP ONLY ANIMATIONS */
-                    md:w-32 md:h-32
-                    md:transition-transform md:duration-500 md:ease-in-out
-                    md:translate-x-1/2 md:group-hover:translate-x-0
-                  "
-                  onError={(e) => {
-                    const target = e.target as HTMLImageElement;
-                    target.src = 'https://placehold.co/200x200/F9F9F9/333?text=No+Image';
-                  }}
-                  unoptimized
-                />
+                    /* MOBILE/TABLET: Fully visible by default, no push down */
+                    translate-y-0 scale-100
+
+                    /* DESKTOP: Push down initially, pop up on hover */
+                    lg:translate-y-4 
+                    lg:group-hover:-translate-y-2.5 
+                    lg:group-hover:scale-110
+                ">
+                  <Image
+                    src={category.imageUrl}
+                    alt={category.altText}
+                    fill
+                    className="object-contain object-bottom drop-shadow-md rounded-3xl"
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
+                    unoptimized
+                    onError={(e) => {
+                      const target = e.target as HTMLImageElement;
+                      target.src = 'https://placehold.co/200x200/F9F9F9/333?text=Image';
+                    }}
+                  />
+                </div>
               </div>
             </Link>
           ))}

@@ -84,19 +84,47 @@ export default function RegisterPage() {
             provider: user.providerData[0]?.providerId || "password",
         });
     };
+    //-------------------------- EMAIL DOMAIN VALIDATION --------------------------
+    const isValidEmailDomain = (email: string) => {
+        const allowedDomains = [
+            "@gmail.com",
+            "@yahoo.com",
+            "@outlook.com",
+            "@hotmail.com",
+            "@icloud.com",
+        ];
 
+        return allowedDomains.some((domain) =>
+            email.toLowerCase().endsWith(domain)
+        );
+    };
+    // -------------------------- OTP SEND --------------------------
     // -------------------------- OTP SEND --------------------------
     const handleSendOTP = () => {
-        if (!form.email.includes("@") || !form.email.includes(".")) {
-            setErrors("Please enter a valid email address.");
+        if (!form.fullName.trim()) {
+            setErrors("Please enter your full name first.");
+            return;
+        }
+
+        if (!form.email.trim()) {
+            setErrors("Please enter your email address.");
+            return;
+        }
+
+        if (!isValidEmailDomain(form.email)) {
+            setErrors(
+                "Please use a valid email (gmail, yahoo, outlook, etc.)"
+            );
             return;
         }
 
         setErrors(null);
         setOtpSent(true);
         setOtpVerified(false);
-        setOtpTimer(120); // 2 minutes
+        setOtpTimer(120);
     };
+
+
 
     // -------------------------- OTP VERIFY --------------------------
     const handleVerifyOTP = () => {
@@ -207,14 +235,17 @@ export default function RegisterPage() {
                             required
                             value={form.fullName}
                             onChange={handleChange}
-                            className="mt-1 w-full px-3 py-2 border rounded-md outline-none"
+                            className="mt-1 w-full px-3 py-2 border border-orange-300 rounded-md outline-none"
                         />
                     </div>
 
                     {/* Email + Send OTP */}
                     <div>
-                        <label className="block text-sm font-medium">Email Address</label>
-                        <div className="flex gap-2">
+                        <label className="block text-sm font-medium mb-1">
+                            Email Address
+                        </label>
+
+                        <div className="flex items-center gap-2">
                             <input
                                 type="email"
                                 name="email"
@@ -222,18 +253,34 @@ export default function RegisterPage() {
                                 value={form.email}
                                 onChange={handleChange}
                                 disabled={otpVerified}
-                                className="mt-1 w-full px-3 py-2 border rounded-md outline-none"
+                                className="w-full h-10 px-3 border border-orange-300 rounded-md outline-none text-sm"
                             />
+
                             {!otpVerified && (
                                 <button
                                     type="button"
                                     onClick={handleSendOTP}
-                                    className="mt-1 px-4 py-2 bg-orange-500 text-white rounded-md"
+                                    disabled={
+                                        !form.fullName.trim() ||
+                                        !form.email.trim() ||
+                                        !isValidEmailDomain(form.email)
+                                    }
+                                    className={`h-10 px-4 rounded-md text-sm whitespace-nowrap text-white transition
+        ${!form.fullName.trim() ||
+                                            !form.email.trim() ||
+                                            !isValidEmailDomain(form.email)
+                                            ? "bg-gray-300 cursor-not-allowed"
+                                            : "bg-orange-500 hover:bg-orange-600"
+                                        }`}
                                 >
                                     Send OTP
                                 </button>
+
+
                             )}
                         </div>
+
+
 
                         {/* OTP Input */}
                         {otpSent && !otpVerified && (
@@ -247,7 +294,7 @@ export default function RegisterPage() {
                                         maxLength={6}
                                         value={otpEntered}
                                         onChange={(e) => setOtpEntered(e.target.value)}
-                                        className="mt-1 w-full px-3 py-2 border rounded-md outline-none"
+                                        className="mt-1 w-full px-3 py-2 border border-orange-200 rounded-md outline-none"
                                     />
                                     <button
                                         type="button"

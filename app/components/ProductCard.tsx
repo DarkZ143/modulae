@@ -5,11 +5,10 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { MapPin, Star, Plus, Minus, Loader2 } from "lucide-react";
-import { calculateDistance, getDeliveryEstimation } from "@/lib/deliveryLogic";
+import { Star, Plus, Minus, Loader2 } from "lucide-react";
 import { useLocation } from "../context/LocationContext";
 import { auth, rtdb } from "@/lib/firebase";
-import { ref, onValue, set, remove, update } from "firebase/database";
+import { ref, onValue, set, remove } from "firebase/database";
 import { onAuthStateChanged } from "firebase/auth";
 import { useRouter } from "next/navigation";
 
@@ -26,7 +25,6 @@ export default function ProductCard({ product }: { product: any }) {
         const unsubscribeAuth = onAuthStateChanged(auth, (currentUser) => {
             setUser(currentUser);
             if (currentUser) {
-                // Listen to this specific product in the cart
                 const itemRef = ref(rtdb, `carts/${currentUser.uid}/${product.slug}`);
                 return onValue(itemRef, (snapshot) => {
                     if (snapshot.exists()) {
@@ -54,10 +52,8 @@ export default function ProductCard({ product }: { product: any }) {
 
         try {
             if (newQty <= 0) {
-                // Remove item if quantity goes to 0
                 await remove(itemRef);
             } else {
-                // Update or Add item
                 await set(itemRef, {
                     title: product.title,
                     price: product.price,
@@ -75,38 +71,39 @@ export default function ProductCard({ product }: { product: any }) {
     };
 
     // Formatting
-    const formatCurrency = (amount: number) =>
-        new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(amount);
-
     const discountPercentage = Math.round(((product.mrp - product.price) / product.mrp) * 100);
     const imageUrl = Array.isArray(product.images) ? product.images[0] : product.image || "/placeholder.png";
 
     return (
-        <div className="bg-white border border-gray-200 rounded-md overflow-hidden hover:shadow-lg transition-all flex flex-col h-full relative group">
+        <div className="bg-white border border-gray-200 rounded-lg overflow-hidden flex flex-col h-full hover:shadow-lg transition-shadow duration-300 relative group">
 
-            {/* IMAGE SECTION */}
-            <Link href={`/products/${product.slug}`} className="block relative w-full h-64 bg-[#F7F7F7] p-6 items-center justify-center">
+            {/* IMAGE SECTION - Removed Top/Bottom Padding (py-0) */}
+            <Link
+                href={`/products/${product.slug}`}
+                className="relative block w-full aspect-5/5 bg-[#F7F7F7] px-4 py-0 items-center justify-center"
+            >
                 <Image
                     src={imageUrl}
                     alt={product.title}
                     fill
-                    className="object-contain mix-blend-multiply"
+                    className="object-contain mix-blend-multiply transition-transform duration-500 group-hover:scale-105 p-2 "
                     sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                 />
             </Link>
 
             {/* CONTENT SECTION */}
-            <div className="p-3 flex flex-col flex-1 gap-1">
+            <div className="p-3 flex flex-col flex-1">
 
+                {/* Title */}
                 <Link href={`/products/${product.slug}`}>
-                    <h3 className="text-gray-900 font-medium text-[15px] leading-snug line-clamp-2 hover:text-[#C7511F] transition-colors">
+                    <h3 className="text-[#0F1111] font-medium text-[15px] leading-snug line-clamp-2 hover:text-[#C7511F] mb-1">
                         {product.title}
                     </h3>
                 </Link>
 
                 {/* Ratings */}
-                <div className="flex items-center gap-1 text-xs mb-1">
-                    <div className="flex items-center text-[#DE7921]">
+                <div className="flex items-center gap-1 mb-1">
+                    <div className="flex text-[#DE7921]">
                         {[...Array(5)].map((_, i) => (
                             <Star
                                 key={i}
@@ -114,61 +111,72 @@ export default function ProductCard({ product }: { product: any }) {
                             />
                         ))}
                     </div>
-                    <span className="text-[#007185] hover:underline cursor-pointer ml-1">
-                        {product.reviews || 50}
+                    <span className="text-[#007185] text-xs hover:underline cursor-pointer">
+                        {product.reviews || Math.floor(Math.random() * 200)}
                     </span>
                 </div>
 
-                <p className="text-[11px] text-gray-500 mb-1">200+ bought in past month</p>
-
                 {/* Price Block */}
-                <div className="flex items-baseline gap-2">
-                    <span className="text-[21px] font-medium text-gray-900">₹{Number(product.price).toLocaleString('en-IN')}</span>
-                    <span className="text-[11px] text-gray-500">M.R.P: <span className="line-through">₹{Number(product.mrp).toLocaleString('en-IN')}</span></span>
-                    <span className="text-[11px] text-gray-900 font-bold">({discountPercentage}% off)</span>
+                <div className="mt-1">
+                    <div className="flex items-baseline gap-0.5">
+                        <span className="text-xs relative -top-1.5">₹</span>
+                        <span className="text-[21px] font-medium text-gray-700">{Number(product.price).toLocaleString('en-IN')}</span>
+                        <span className="text-[11px] text-[#565959] ml-1.5 line-through">
+                            M.R.P: ₹{Number(product.mrp).toLocaleString('en-IN')}
+                        </span>
+                        <span className="text-[11px] text-[#565959] ml-1">({discountPercentage}% off)</span>
+                    </div>
                 </div>
 
-                {/* Delivery Logic */}
-                <div className="mt-1 text-[11px]">
+                {/* Delivery Info */}
+                <div className="mt-1 text-[12px] text-[#565959] leading-tight">
                     {location.deliveryDateString ? (
-                        <p className="text-gray-900 leading-tight">
-                            FREE delivery <span className="font-bold">{location.deliveryDateString}</span>
-                        </p>
+                        <>
+                            Get it by <span className="font-bold text-[#0F1111]">{location.deliveryDateString}</span>
+                            <br />
+                            <span className="text-[#565959]">FREE Delivery by Modulae</span>
+                        </>
                     ) : (
-                        <p className="text-gray-500 italic">Set location to see delivery date</p>
+                        <span className="italic">Set location to see delivery</span>
                     )}
                 </div>
 
+                {/* SPACER to push button to bottom */}
+                <div className="flex-1 min-h-2"></div>
+
                 {/* ✅ ADD TO CART / QUANTITY CONTROL */}
-                <div className="mt-auto pt-3">
+                <div className="mt-2">
                     {quantity === 0 ? (
                         <button
                             onClick={() => updateCart(1)}
                             disabled={isUpdating}
-                            className="w-full bg-[#ff8614] hover:bg-[#f74e00] text-black text-[13px] py-2 rounded-full shadow-sm border border-[#FCD200] transition-colors flex justify-center items-center font-medium"
+                            className="w-[140px] bg-orange-400 hover:bg-orange-500 text-white text-[13px] py-1.5 rounded-full shadow-sm border border-[#FCD200] transition-colors flex justify-center items-center font-normal"
                         >
-                            {isUpdating ? <Loader2 className="w-4 h-4 animate-spin" /> : "Add to Cart"}
+                            {isUpdating ? <Loader2 className="w-4 h-4 animate-spin" /> : "Add to cart"}
                         </button>
                     ) : (
-                        <div className="flex items-center justify-between bg-white border border-gray-300 rounded-full shadow-sm overflow-hidden">
+                        <div className="flex items-center bg-white border border-gray-300 rounded-md shadow-sm w-fit h-8">
+                            {/* Minus Button */}
                             <button
                                 onClick={() => updateCart(quantity - 1)}
                                 disabled={isUpdating}
-                                className="px-4 py-2 hover:bg-gray-100 text-red-600 border-r"
+                                className="w-9 h-full flex items-center justify-center bg-gray-100 hover:bg-gray-200 rounded-l-md border-r border-gray-300 transition-colors"
                             >
-                                <Minus className="w-3 h-3" />
+                                <Minus className="w-3.5 h-3.5 text-red-500" />
                             </button>
 
-                            <span className="text-sm font-bold text-orange-500 px-2">
+                            {/* Quantity Display */}
+                            <div className="w-10 h-full flex items-center justify-center text-[13px] font-bold text-[#0F1111] bg-white">
                                 {isUpdating ? <Loader2 className="w-3 h-3 animate-spin" /> : quantity}
-                            </span>
+                            </div>
 
+                            {/* Plus Button */}
                             <button
                                 onClick={() => updateCart(quantity + 1)}
                                 disabled={isUpdating}
-                                className="px-4 py-2 hover:bg-gray-100 text-green-600 border-l"
+                                className="w-9 h-full flex items-center justify-center bg-gray-100 hover:bg-gray-200 rounded-r-md border-l border-gray-300 transition-colors"
                             >
-                                <Plus className="w-3 h-3" />
+                                <Plus className="w-3.5 h-3.5 text-green-500" />
                             </button>
                         </div>
                     )}

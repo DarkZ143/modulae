@@ -1,5 +1,4 @@
 import React from 'react'
-import TopOfferBar from './components/TopOfferBar'
 import Navbar from './components/Navbar'
 import HeroSlider from './components/HeroSlider'
 import Explore from './components/Explore'
@@ -15,7 +14,7 @@ import Footer from './components/Footer'
 const Home = () => {
   return (
     <div>
-      
+
       <Navbar />
       <HeroSlider />
       <Explore />
@@ -27,7 +26,7 @@ const Home = () => {
       <Clients />
       <BlogSection />
       <Footer />
-      
+
     </div>
   )
 }

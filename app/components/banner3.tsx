@@ -93,7 +93,7 @@ const MarqueeAd = () => {
           {/* Dark Overlay - positioned to the left */}
           <div className="absolute inset-0 flex items-center justify-start bg-linear-to-r from-black/60 via-black/20 to-transparent">
             {/* Text Content Box - UPDATED for mobile */}
-            <div className="bg-black/40 backdrop-blur-sm text-white p-4 sm:p-6 md:p-10 lg:p-14 rounded-r-lg text-left w-11/12 max-w-lg sm:max-w-xl animate-fade-in-up ml-4 md:ml-10">
+            <div className="bg-black/40 backdrop-blur-sm text-white p-4 sm:p-6 md:p-10 lg:p-14 rounded-r-lg text-left w-11/12 max-w-lg sm:max-w-xl animate-fade-in-up ml-8 md:ml-20">
               <p className="text-xs sm:text-sm md:text-base font-semibold text-gray-300 uppercase tracking-wider">
                 {adDetails.subtitle}
               </p>

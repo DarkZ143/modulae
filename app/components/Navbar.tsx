@@ -215,7 +215,7 @@ const Navbar = () => {
       <div ref={desktopSearchRef} className={`fixed top-0 left-0 right-0 bg-white p-4 border border-orange-400 shadow-md z-60 transition-transform duration-300 hidden md:flex ${isDesktopSearchOpen ? "translate-y-0" : "-translate-y-full"}`}>
         <div className="max-w-7xl mx-auto w-full relative">
           <div className="flex items-center gap-2 w-full">
-            <form onSubmit={handleSearchSubmit} className="flex flex-1 border border-gray-600 rounded-md overflow-hidden">
+            <form onSubmit={handleSearchSubmit} className="flex flex-1 border border-gray-100 rounded-md overflow-hidden">
               <input type="text" placeholder="Search products..." className="flex-1 px-4 py-2 text-sm outline-none border-gray-700" autoFocus value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} onKeyDown={(e) => { if (e.key === "Escape") { setIsDesktopSearchOpen(false); setSearchQuery(""); } }} />
               <button type="submit" className="px-4 py-2 bg-orange-500 text-white"><IconSearch className="w-5 h-5" /></button>
             </form>
@@ -224,11 +224,11 @@ const Navbar = () => {
           {searchResults.length > 0 && (
             <div className="absolute top-full left-0 w-full bg-white shadow-lg border border-t-0 rounded-b-lg mt-1 overflow-hidden z-50">
               {searchResults.map((item) => (
-                <Link key={item.slug} href={`/products/${item.slug}`} onClick={handleResultClick} className="flex items-center gap-4 p-3 hover:bg-gray-50 transition border-b last:border-none">
+                <Link key={item.slug} href={`/products/${item.slug}`} onClick={handleResultClick} className="flex items-center gap-4 p-3 hover:bg-gray-50 transition border-b  border-gray-400 last:border-none">
                   <div className="relative w-12 h-12 bg-gray-100 rounded shrink-0">
                     <Image src={item.images?.[0] || "/placeholder.png"} alt={item.title} fill className="object-cover rounded" />
                   </div>
-                  <div><p className="font-semibold text-gray-800 text-sm">{item.title}</p><p className="text-orange-600 text-xs font-bold">₹{item.price}</p></div>
+                  <div><p className="font-semibold text-gray-500 text-sm">{item.title}</p><p className="text-orange-600 text-xs font-semibold">₹{item.price}</p></div>
                 </Link>
               ))}
             </div>
@@ -249,11 +249,11 @@ const Navbar = () => {
           {searchResults.length > 0 && (
             <div className="absolute top-full left-0 w-full bg-white shadow-xl border-t mt-2 rounded-lg max-h-[60vh] overflow-y-auto z-50">
               {searchResults.map((item) => (
-                <Link key={item.slug} href={`/products/${item.slug}`} onClick={handleResultClick} className="flex items-center gap-3 p-3 hover:bg-gray-50 border-b last:border-none">
+                <Link key={item.slug} href={`/products/${item.slug}`} onClick={handleResultClick} className="flex items-center gap-3 p-3 hover:bg-gray-50 border-b border-gray-400 last:border-none">
                   <div className="relative w-10 h-10 bg-gray-100 rounded shrink-0">
                     <Image src={item.images?.[0] || "/placeholder.png"} alt={item.title} fill className="object-cover rounded" />
                   </div>
-                  <div><p className="font-semibold text-gray-800 text-sm truncate">{item.title}</p><p className="text-orange-600 text-xs font-bold">₹{item.price}</p></div>
+                  <div><p className="font-semibold text-gray-500 text-sm truncate">{item.title}</p><p className="text-orange-600 text-xs font-semibold">₹{item.price}</p></div>
                 </Link>
               ))}
             </div>
@@ -266,7 +266,7 @@ const Navbar = () => {
         <div className="max-w-7xl mx-auto px-6 py-4 md:py-6 flex justify-between items-center">
           {/* Logo */}
           <div className="flex items-center gap-3">
-            <button onClick={() => setIsOpen(!isOpen)} className="md:hidden text-gray-700">
+            <button onClick={() => setIsOpen(!isOpen)} className="md:hidden text-gray-500">
               {isOpen ? <IconX className="w-6 h-6" /> : <IconMenu className="w-6 h-6" />}
             </button>
 
@@ -275,7 +275,7 @@ const Navbar = () => {
                 <Image src={logo.src} alt={logo.alt || "Modulae"} width={120} height={40} className="h-8 w-auto object-contain" />
               ) : (
                 <>
-                  <span className="text-5xl font-bold text-orange-500">M</span>
+                  <span className="text-5xl font-semibold text-orange-500">M</span>
                   <span className="text-3xl font-semibold">odulae</span>
                 </>
               )}
@@ -286,13 +286,13 @@ const Navbar = () => {
           <div className="hidden md:flex items-center gap-8 relative" ref={mainMenusRef}>
             {/* Shop By Category Dropdown */}
             <div className="relative" ref={categoryMenuRef}>
-              <button onClick={() => setCategoryOpen(!categoryOpen)} className="bg-gray-100 font-semibold px-4 py-2 rounded-md flex items-center gap-2 hover:bg-gray-200 transition">
+              <button onClick={() => setCategoryOpen(!categoryOpen)} className="bg-gray-100 text-gray-700 font-semibold px-4 py-2 rounded-md flex items-center gap-2 hover:bg-gray-200 transition">
                 Shop By Category <IconMenu className="w-4 h-4" />
               </button>
               {categoryOpen && (
                 <div className="absolute top-full left-0 mt-2 bg-white shadow-lg rounded-md w-56 py-2 z-50 border border-gray-100 max-h-96 overflow-y-auto">
                   {shopCategories.length > 0 ? shopCategories.map((cat) => (
-                    <Link key={cat} href={`/${cat}`} className="block px-4 py-2 hover:bg-orange-50 text-sm text-gray-700 hover:text-orange-600 capitalize">
+                    <Link key={cat} href={`/${cat}`} className="block px-4 py-2 hover:bg-orange-50 text-sm text-gray-600 hover:text-orange-600 capitalize">
                       {cat.replace(/-/g, ' ')}
                     </Link>
                   )) : <p className="px-4 py-2 text-sm text-gray-400">Loading...</p>}
@@ -304,11 +304,11 @@ const Navbar = () => {
             {menuItems.map((menu, idx) => (
               <div key={idx} className="relative group">
                 {menu.type === 'link' ? (
-                  <Link href={menu.href || "#"} className="flex items-center gap-1 text-sm font-semibold hover:text-orange-500">
+                  <Link href={menu.href || "#"} className="flex items-center gap-1 text-sm text-gray-600 font-semibold hover:text-orange-500">
                     {menu.title}
                   </Link>
                 ) : (
-                  <button onClick={() => setActiveDropdown(activeDropdown === idx ? null : idx)} className="flex items-center gap-1 text-sm font-semibold hover:text-orange-500">
+                  <button onClick={() => setActiveDropdown(activeDropdown === idx ? null : idx)} className="flex items-center gap-1 text-sm text-gray-600 font-semibold hover:text-orange-500">
                     {menu.title} <IconChevronDown className="w-4 h-4" />
                   </button>
                 )}
@@ -319,14 +319,14 @@ const Navbar = () => {
                     {menu.children && menu.children.map((cat: any, cIdx: number) => (
                       <div key={cIdx} className="mb-4 break-inside-avoid">
                         {cat.type === 'link' ? (
-                          <Link href={cat.href || "#"} className="font-bold text-orange-600 mb-2 block hover:underline">{cat.title}</Link>
+                          <Link href={cat.href || "#"} className="font-medium text-orange-600 mb-2 block hover:underline">{cat.title}</Link>
                         ) : (
                           <>
-                            <h4 className="font-bold text-orange-600 mb-2 text-sm uppercase">{cat.title}</h4>
+                            <h4 className="font-medium text-orange-600 mb-2 text-sm uppercase">{cat.title}</h4>
                             <ul className="space-y-1">
                               {cat.items?.map((item: any, iIdx: number) => (
                                 <li key={iIdx}>
-                                  <Link href={item.href || "#"} className="block text-sm text-gray-600 hover:text-gray-900 hover:underline">
+                                  <Link href={item.href || "#"} className="block text-sm text-gray-600 hover:text-gray-900 hover:underline cursor-pointer">
                                     {item.title}
                                   </Link>
                                 </li>
@@ -348,17 +348,12 @@ const Navbar = () => {
             <button onClick={() => setIsDesktopSearchOpen(true)} className="hidden md:block bg-gray-50 p-2 rounded-full hover:bg-gray-100"><IconSearch className="w-5 h-5 text-gray-600" /></button>
             <button onClick={() => setIsMobileSearchOpen(true)} className="md:hidden bg-gray-50 p-2 rounded-full"><IconSearch className="w-5 h-5 text-gray-600" /></button>
 
-            {/* Admin Link */}
-            {isAdmin && (
-              <Link href="/admin-section" className="hidden md:flex items-center gap-1 text-red-600 font-bold text-xs bg-red-50 px-2 py-1 rounded border border-red-100">
-                <LayoutDashboard className="w-3 h-3" /> Admin
-              </Link>
-            )}
+            
 
             {/* Cart */}
-            <button onClick={() => router.push("/cart")} className="relative flex items-center gap-1 hover:text-orange-500">
+            <button onClick={() => router.push("/cart")} className="relative flex items-center gap-1 text-gray-600 hover:text-orange-500">
               <IconBag className="w-5 h-5" />
-              <span className="absolute -top-1 -right-2 w-4 h-4 bg-orange-500 text-white text-[10px] font-bold rounded-full flex justify-center items-center">
+              <span className="absolute -top-1 -right-2 w-4 h-4 bg-orange-500 text-white text-[10px] font-semibold rounded-full flex justify-center items-center">
                 {cartCount}
               </span>
             </button>
@@ -369,14 +364,14 @@ const Navbar = () => {
       {/* MOBILE DRAWER */}
       <div className={`fixed top-0 left-0 h-full w-72 bg-white shadow-2xl z-70 transition-transform duration-300 overflow-y-auto ${isOpen ? "translate-x-0" : "-translate-x-full"} md:hidden`}>
         <div className="flex justify-between items-center px-5 py-4 border-b bg-orange-50">
-          <span className="font-bold text-xl text-orange-600">Menu</span>
+          <span className="font-semibold text-xl text-orange-600">Menu</span>
           <button onClick={() => setIsOpen(false)}><IconX className="w-6 h-6 text-gray-600" /></button>
         </div>
 
         {/* Admin Link Mobile */}
         {isAdmin && (
           <div className="px-5 py-3 border-b">
-            <Link href="/admin-section" className="flex items-center gap-2 text-red-600 font-bold text-sm bg-red-50 p-2 rounded-lg justify-center">
+            <Link href="/admin-section" className="flex items-center gap-2 text-red-600 font-semibold text-sm bg-red-50 p-2 rounded-lg justify-center">
               <LayoutDashboard className="w-4 h-4" /> Go to Admin Panel
             </Link>
           </div>
@@ -387,10 +382,10 @@ const Navbar = () => {
           {menuItems.map((menu, idx) => (
             <li key={idx}>
               {menu.type === 'link' ? (
-                <Link href={menu.href || "#"} className="block py-2 font-semibold text-gray-700">{menu.title}</Link>
+                <Link href={menu.href || "#"} className="block py-2 font-semibold text-gray-500">{menu.title}</Link>
               ) : (
                 <>
-                  <button onClick={() => setMobileSubMenuOpen(mobileSubMenuOpen === idx ? null : idx)} className="flex justify-between items-center w-full font-semibold text-gray-700 py-2">
+                  <button onClick={() => setMobileSubMenuOpen(mobileSubMenuOpen === idx ? null : idx)} className="flex justify-between items-center w-full font-semibold text-gray-500 py-2">
                     {menu.title} <IconChevronDown className={`w-4 h-4 transition ${mobileSubMenuOpen === idx ? 'rotate-180' : ''}`} />
                   </button>
 
@@ -399,10 +394,10 @@ const Navbar = () => {
                       {menu.children?.map((cat: any, cIdx: number) => (
                         <div key={cIdx}>
                           {cat.type === 'link' ? (
-                            <Link href={cat.href || "#"} className="font-bold text-orange-600 text-sm block mb-1">{cat.title}</Link>
+                            <Link href={cat.href || "#"} className="font-semibold text-orange-600 text-sm block mb-1">{cat.title}</Link>
                           ) : (
                             <>
-                              <p className="text-xs font-bold text-gray-400 uppercase mb-1">{cat.title}</p>
+                              <p className="text-xs font-semibold text-gray-400 uppercase mb-1">{cat.title}</p>
                               <ul className="space-y-2 pl-2">
                                 {cat.items?.map((item: any, iIdx: number) => (
                                   <li key={iIdx}>

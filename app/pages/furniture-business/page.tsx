@@ -1,7 +1,7 @@
+/* eslint-disable @next/next/no-html-link-for-pages */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import TopOfferBar from "../../components/TopOfferBar";
 import Navbar from "../../components/Navbar";
 import Footer from "../../components/Footer";
 import LatestProducts from "../../components/LatestProduct";
@@ -48,7 +48,7 @@ export default function FurnitureBusinessPage() {
 
     return (
         <>
-            <TopOfferBar />
+
             <Navbar />
             <CategoryHeader title="Furniture Business" />
 
@@ -126,7 +126,7 @@ export default function FurnitureBusinessPage() {
                                     {item.desc}
                                 </p>
 
-                               
+
                             </div>
                         ))}
                     </div>

@@ -4,7 +4,8 @@
 
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
-import AccountSidebar from "../components/AccountSidebar";
+import Link from "next/link"; // Added Link
+import { User, Package, Heart, MapPin, Settings, LogOut } from "lucide-react"; // Added Icons
 
 import { useAuth } from "../context/AuthContext";
 import { useEffect, useState } from "react";
@@ -88,6 +89,46 @@ export default function SettingsPage() {
         router.replace("/auth/login");
     };
 
+    // ========================= Sidebar Component =========================
+    const Sidebar = () => (
+        <aside className="bg-white p-6 shadow-sm rounded-xl border-gray-400border-gray-100 h-fit lg:sticky lg:top-24 w-full lg:w-72 shrink-0">
+            <div className="flex items-center gap-4 mb-6 pb-4 border-b border-gray-100">
+                <div className="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center text-orange-600 font-bold text-xl">
+                    {user?.displayName?.charAt(0).toUpperCase() || "U"}
+                </div>
+                <div className="overflow-hidden">
+                    <p className="text-sm text-gray-500">Hello,</p>
+                    <h2 className="text-lg font-bold text-gray-800 truncate">{user?.displayName || "User"}</h2>
+                </div>
+            </div>
+
+            <nav className="space-y-1">
+                <Link href="/profile" className="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-50 hover:text-orange-600 rounded-lg transition-colors">
+                    <User className="w-5 h-5" /> Account Settings
+                </Link>
+                <Link href="/my-orders" className="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-50 hover:text-orange-600 rounded-lg transition-colors">
+                    <Package className="w-5 h-5" /> My Orders
+                </Link>
+                <Link href="/wishlist" className="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-50 hover:text-orange-600 rounded-lg transition-colors">
+                    <Heart className="w-5 h-5" /> My Wishlist
+                </Link>
+                <Link href="/addresses" className="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-50 hover:text-orange-600 rounded-lg transition-colors">
+                    <MapPin className="w-5 h-5" /> Saved Addresses
+                </Link>
+                {/* Active Link */}
+                <Link href="/settings" className="flex items-center gap-3 px-4 py-3 bg-orange-50 text-orange-600 font-semibold rounded-lg transition-colors">
+                    <Settings className="w-5 h-5" /> Settings
+                </Link>
+                <button
+                    onClick={() => setLogoutModal(true)}
+                    className="w-full flex items-center gap-3 px-4 py-3 text-red-500 hover:bg-red-50 rounded-lg transition-colors mt-4 border-t border-gray-100"
+                >
+                    <LogOut className="w-5 h-5" /> Logout
+                </button>
+            </nav>
+        </aside>
+    );
+
     if (loading || loadingData)
         return (
             <div className="min-h-screen flex items-center justify-center">
@@ -101,10 +142,11 @@ export default function SettingsPage() {
             <Navbar />
 
             <div className="max-w-6xl mx-auto px-4 py-10 flex flex-col lg:flex-row gap-8">
-                <AccountSidebar />
+                {/* Use the local Sidebar component */}
+                <Sidebar />
 
                 {/* Main Settings */}
-                <div className="flex-1 bg-white rounded-xl shadow-sm p-6 border">
+                <div className="flex-1 bg-white rounded-xl shadow-sm shadow-orange-200 p-6 border-gray-400">
                     <h2 className="text-2xl font-bold mb-6">Settings</h2>
 
                     {/* NOTIFICATIONS */}
@@ -156,7 +198,7 @@ export default function SettingsPage() {
                             <select
                                 value={settings.language}
                                 onChange={(e) => updateSetting("language", e.target.value)}
-                                className="w-full mt-2 border p-2 rounded"
+                                className="w-full mt-2 border-gray-400p-2 rounded"
                             >
                                 <option>English</option>
                                 <option>Hindi</option>
@@ -201,7 +243,7 @@ export default function SettingsPage() {
 
                         <div className="flex justify-end gap-3 mt-6">
                             <button
-                                className="px-4 py-2 border rounded-lg"
+                                className="px-4 py-2 border-gray-400rounded-lg"
                                 onClick={() => setLogoutModal(false)}
                             >
                                 Cancel
@@ -229,7 +271,7 @@ export default function SettingsPage() {
 
                         <div className="flex justify-end gap-3 mt-6">
                             <button
-                                className="px-4 py-2 border rounded-lg"
+                                className="px-4 py-2 border-gray-400rounded-lg"
                                 onClick={() => setDeleteModal(false)}
                             >
                                 Cancel

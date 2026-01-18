@@ -11,7 +11,7 @@ import { onAuthStateChanged } from "firebase/auth";
 
 import Navbar from "@/app/components/Navbar";
 import Footer from "@/app/components/Footer";
-import TopOfferBar from "@/app/components/TopOfferBar";
+
 import Image from "next/image";
 import LatestProducts from "../components/LatestProduct";
 import { Ticket, CheckCircle, X } from "lucide-react";

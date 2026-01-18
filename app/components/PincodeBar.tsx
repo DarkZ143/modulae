@@ -118,14 +118,14 @@ export default function PincodeBar() {
                                 </div>
                                 <Link
                                     href="/profile"
-                                    className="block px-4 py-2 text-sm hover:bg-gray-50 hover:text-orange-600 items-center gap-2"
+                                    className=" px-4 py-2 text-sm hover:bg-gray-50 hover:text-orange-600  gap-2 flex items-center justify-left"
                                     onClick={() => setIsUserMenuOpen(false)}
                                 >
                                     <User className="w-4 h-4" /> Your Account
                                 </Link>
                                 <Link
                                     href="/my-orders"
-                                    className="block px-4 py-2 text-sm hover:bg-gray-50 hover:text-orange-600 items-center gap-2"
+                                    className=" px-4 py-2 text-sm hover:bg-gray-50 hover:text-orange-600  gap-2 flex items-center justify-left"
                                     onClick={() => setIsUserMenuOpen(false)}
                                 >
                                     <Package className="w-4 h-4" /> Your Orders

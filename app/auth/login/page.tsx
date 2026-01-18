@@ -104,7 +104,7 @@ export default function LoginPage() {
 
     return (
         <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-blue-50 via-white to-orange-50 px-4">
-            <div className="w-full max-w-lg bg-white/80 backdrop-blur-lg shadow-xl rounded-2xl p-8 border border-blue-100">
+            <div className="w-full max-w-lg bg-white/80 backdrop-blur-lg shadow-xl rounded-2xl p-8 border-gray-400border-blue-100">
                 <h1 className="text-3xl font-bold text-gray-900 text-center mb-2">
                     Welcome back
                 </h1>
@@ -113,13 +113,13 @@ export default function LoginPage() {
                 </p>
 
                 {info && (
-                    <div className="mb-4 text-sm text-green-700 bg-green-50 border p-2 rounded-md">
+                    <div className="mb-4 text-sm text-green-700 bg-green-50 border-gray-400p-2 rounded-md">
                         {info}
                     </div>
                 )}
 
                 {error && (
-                    <div className="mb-4 text-sm text-red-600 bg-red-50 border p-2 rounded-md">
+                    <div className="mb-4 text-sm text-red-600 bg-red-50 border-gray-400p-2 rounded-md">
                         {error}
                     </div>
                 )}
@@ -136,7 +136,7 @@ export default function LoginPage() {
                                     required
                                     value={form.email}
                                     onChange={handleChange}
-                                    className="mt-1 w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-orange-200 outline-none"
+                                    className="mt-1 w-full px-3 py-2 border border-orange-300 rounded-md focus:ring-2 focus:ring-orange-200 outline-none"
                                 />
                             </div>
 
@@ -148,7 +148,7 @@ export default function LoginPage() {
                                     required
                                     value={form.password}
                                     onChange={handleChange}
-                                    className="mt-1 w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-orange-200 outline-none"
+                                    className="mt-1 w-full px-3 py-2 border border-orange-300 rounded-md focus:ring-2 focus:ring-orange-200 outline-none"
                                 />
 
                                 <p
@@ -176,10 +176,10 @@ export default function LoginPage() {
 
                         <button
                             onClick={handleGoogleLogin}
-                            className="w-full py-3 border rounded-lg flex items-center justify-center gap-3 hover:bg-gray-50 transition"
+                            className="w-full py-3 border-gray-400rounded-lg flex items-center justify-center gap-3 hover:bg-gray-50 transition"
                         ><span className="text-gray-700 font-medium">Sign in With</span>
                             <Image src="/google.png" alt="Google" width={60} height={60} />
-                            
+
                         </button>
 
                         <p className="mt-6 text-center text-sm text-gray-500">
@@ -201,7 +201,7 @@ export default function LoginPage() {
                             value={otpInput}
                             onChange={(e) => setOtpInput(e.target.value)}
                             maxLength={6}
-                            className="mt-2 w-full px-3 py-2 text-center border rounded-md tracking-widest text-xl font-mono"
+                            className="mt-2 w-full px-3 py-2 text-center border-gray-400rounded-md tracking-widest text-xl font-mono"
                             placeholder="••••••"
                         />
 
@@ -241,7 +241,7 @@ export default function LoginPage() {
                                     required
                                     value={forgotEmail}
                                     onChange={(e) => setForgotEmail(e.target.value)}
-                                    className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-orange-200 outline-none"
+                                    className="w-full px-3 py-2 border-gray-400rounded-md focus:ring-2 focus:ring-orange-200 outline-none"
                                 />
 
                                 {forgotMessage && (

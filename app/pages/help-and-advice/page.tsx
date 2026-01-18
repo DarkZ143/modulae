@@ -2,7 +2,6 @@
 "use client";
 
 import { useState } from "react";
-import TopOfferBar from "../../components/TopOfferBar";
 import Navbar from "../../components/Navbar";
 import Footer from "../../components/Footer";
 import LatestProducts from "../../components/LatestProduct";
@@ -54,7 +53,7 @@ export default function HelpAndAdvicePage() {
 
     return (
         <>
-            <TopOfferBar />
+            
             <Navbar />
 
             <div className="max-w-7xl mx-auto px-6 py-10">

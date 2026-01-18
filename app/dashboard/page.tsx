@@ -76,7 +76,7 @@ export default function DashboardPage() {
                 <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-8">
 
                     {/* LEFT SIDEBAR */}
-                    <aside className="bg-white p-6 shadow-lg rounded-xl border space-y-6 h-fit lg:sticky lg:top-28">
+                    <aside className="bg-white p-6 shadow-lg rounded-xl border-gray-400space-y-6 h-fit lg:sticky lg:top-28">
                         <div>
                             <h2 className="text-xl font-bold text-gray-800">My Account</h2>
                             <p className="text-sm text-gray-500 mt-1 truncate">{user.email}</p>
@@ -100,24 +100,24 @@ export default function DashboardPage() {
 
                         {/* STATS CARDS */}
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                            <div className="bg-white border shadow-sm p-6 rounded-xl hover:shadow-md transition cursor-pointer" onClick={() => router.push('/my-orders')}>
+                            <div className="bg-white border-gray-400shadow-sm p-6 rounded-xl hover:shadow-md transition cursor-pointer" onClick={() => router.push('/my-orders')}>
                                 <h3 className="text-lg font-semibold text-gray-700">Total Orders</h3>
                                 <p className="text-3xl font-bold text-orange-600 mt-3">{ordersCount}</p>
                             </div>
 
-                            <div className="bg-white border shadow-sm p-6 rounded-xl hover:shadow-md transition">
+                            <div className="bg-white border-gray-400shadow-sm p-6 rounded-xl hover:shadow-md transition">
                                 <h3 className="text-lg font-semibold text-gray-700">Wishlist</h3>
                                 <p className="text-3xl font-bold text-orange-600 mt-3">{wishlistCount}</p>
                             </div>
 
-                            <div className="bg-white border shadow-sm p-6 rounded-xl hover:shadow-md transition cursor-pointer" onClick={() => router.push('/cart')}>
+                            <div className="bg-white border-gray-400shadow-sm p-6 rounded-xl hover:shadow-md transition cursor-pointer" onClick={() => router.push('/cart')}>
                                 <h3 className="text-lg font-semibold text-gray-700">Cart Items</h3>
                                 <p className="text-3xl font-bold text-orange-600 mt-3">{cartCount}</p>
                             </div>
                         </div>
 
                         {/* ACCOUNT INFO BOX */}
-                        <div className="bg-white border shadow-sm p-6 rounded-xl">
+                        <div className="bg-white border-gray-400shadow-sm p-6 rounded-xl">
                             <h2 className="text-xl font-bold text-gray-800 mb-4">Account Details</h2>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-gray-700">
                                 <div>

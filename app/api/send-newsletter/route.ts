@@ -55,7 +55,7 @@ export async function POST(req: Request) {
                     <br />
                     <hr style="border: 0; border-top: 1px solid #eee;" />
                     <p style="font-size: 12px; color: #888; text-align: center;">
-                        © 2025 Modulae. All rights reserved.
+                        © 2026 Modulae. All rights reserved.
                     </p>
                 </div>
             `,

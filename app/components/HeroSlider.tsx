@@ -76,11 +76,12 @@ const HeroSlider = () => {
             <Link
               href={slide.link || "/shop"}
               className="
-                    bg-white text-gray-900 
+                    bg-white text-gray-700 
                     font-bold py-3 px-8 rounded-full 
                     shadow-xl border-2 border-white
                     transform transition-all duration-300
                     hover:scale-110 hover:bg-gray-100 hover:shadow-2xl
+                    hover:text-white
                     flex items-center gap-2
                     animate-fade-in-up
                   "
@@ -98,8 +99,8 @@ const HeroSlider = () => {
             key={index}
             onClick={() => setCurrentSlide(index)}
             className={`h-2 rounded-full transition-all duration-300 shadow-sm ${index === currentSlide
-                ? "bg-orange-500 w-8"
-                : "bg-white/60 hover:bg-white w-2"
+              ? "bg-orange-500 w-8"
+              : "bg-white/60 hover:bg-white w-2"
               }`}
             aria-label={`Go to slide ${index + 1}`}
           ></button>

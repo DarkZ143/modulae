@@ -5,7 +5,7 @@
 import { useState, useEffect } from "react";
 import { ref, get, set, remove } from "firebase/database";
 import { rtdb } from "@/lib/firebase";
-import { Trash2, Plus, Edit, Image as ImageIcon, X, ChevronDown, ChevronRight, Folder, FolderPlus, AlertTriangle } from "lucide-react";
+import { Trash2, Plus, Edit, Image as ImageIcon, X, ChevronDown, ChevronRight, Folder, FolderPlus, AlertTriangle, List } from "lucide-react";
 import Image from "next/image";
 
 const DEFAULT_CATEGORIES = [
@@ -36,11 +36,18 @@ export default function AdminProducts() {
         rating: 4.5,
         reviews: 0,
         images: [] as string[],
-        specifications: {} as Record<string, string>
+        specifications: {} as Record<string, string>,
+        highlights: {} as Record<string, string> // ✅ New Highlights Field
     });
+
+    // Temp Inputs
     const [newImageUrl, setNewImageUrl] = useState("");
     const [newSpecKey, setNewSpecKey] = useState("");
     const [newSpecValue, setNewSpecValue] = useState("");
+
+    // ✅ Highlights Temp Inputs
+    const [newHighlightKey, setNewHighlightKey] = useState("");
+    const [newHighlightValue, setNewHighlightValue] = useState("");
 
     // --- 1. INITIAL FETCH (Categories & Products) ---
     const fetchAllData = async () => {
@@ -136,7 +143,8 @@ export default function AdminProducts() {
             rating: Number(formData.rating),
             reviews: Number(formData.reviews),
             images: formData.images,
-            specifications: formData.specifications
+            specifications: formData.specifications,
+            highlights: formData.highlights || {} // ✅ Save Highlights
         });
 
         alert("Product Saved!");
@@ -160,6 +168,8 @@ export default function AdminProducts() {
     const handleRemoveImage = (url: string) => {
         setFormData({ ...formData, images: formData.images.filter(u => u !== url) });
     };
+
+    // Specifications Logic
     const handleAddSpec = () => {
         if (newSpecKey && newSpecValue) {
             setFormData({ ...formData, specifications: { ...formData.specifications, [newSpecKey]: newSpecValue } });
@@ -172,13 +182,27 @@ export default function AdminProducts() {
         setFormData({ ...formData, specifications: newSpecs });
     };
 
+    // ✅ Highlights Logic
+    const handleAddHighlight = () => {
+        if (newHighlightKey && newHighlightValue) {
+            setFormData({ ...formData, highlights: { ...formData.highlights, [newHighlightKey]: newHighlightValue } });
+            setNewHighlightKey(""); setNewHighlightValue("");
+        }
+    };
+    const handleRemoveHighlight = (key: string) => {
+        const newHighlights = { ...formData.highlights };
+        delete newHighlights[key];
+        setFormData({ ...formData, highlights: newHighlights });
+    };
+
     const resetForm = () => {
         setFormData({
             category: expandedCategory || categories[0] || "products",
             slug: "", title: "", price: 0, mrp: 0, stock: 10, description: "",
-            rating: 4.5, reviews: 0, images: [], specifications: {}
+            rating: 4.5, reviews: 0, images: [], specifications: {}, highlights: {}
         });
         setNewImageUrl(""); setNewSpecKey(""); setNewSpecValue("");
+        setNewHighlightKey(""); setNewHighlightValue("");
     };
 
     return (
@@ -320,7 +344,8 @@ export default function AdminProducts() {
                                                                                 setFormData({
                                                                                     category: p.category, slug: p.id, title: p.title, price: p.price, mrp: p.mrp, stock: p.stock,
                                                                                     description: p.description, rating: p.rating || 4.5, reviews: p.reviews || 0,
-                                                                                    images: p.images || [], specifications: p.specifications || {}
+                                                                                    images: p.images || [], specifications: p.specifications || {},
+                                                                                    highlights: p.highlights || {} // Load highlights
                                                                                 });
                                                                                 setIsEditing(true);
                                                                             }}
@@ -433,12 +458,35 @@ export default function AdminProducts() {
                                 </div>
                             </div>
 
-                            {/* Specs */}
+                            {/* ✅ HIGHLIGHTS SECTION */}
                             <div className="md:col-span-2 border-t pt-4">
-                                <label className="block text-sm font-bold mb-2 text-gray-800">Specifications</label>
+                                <label className="block text-sm font-bold mb-2 text-gray-800 items-center gap-2">
+                                    <AlertTriangle className="w-4 h-4 text-orange-500" /> Product Highlights
+                                </label>
                                 <div className="flex gap-2 mb-3">
-                                    <input type="text" value={newSpecKey} onChange={e => setNewSpecKey(e.target.value)} className="flex-1 border p-2.5 rounded-lg text-sm" placeholder="Key" />
-                                    <input type="text" value={newSpecValue} onChange={e => setNewSpecValue(e.target.value)} className="flex-1 border p-2.5 rounded-lg text-sm" placeholder="Value" />
+                                    <input type="text" value={newHighlightKey} onChange={e => setNewHighlightKey(e.target.value)} className="flex-1 border p-2.5 rounded-lg text-sm" placeholder="Title (e.g. Type)" />
+                                    <input type="text" value={newHighlightValue} onChange={e => setNewHighlightValue(e.target.value)} className="flex-1 border p-2.5 rounded-lg text-sm" placeholder="Value (e.g. Cupboard)" />
+                                    <button onClick={handleAddHighlight} type="button" className="bg-orange-600 text-white px-4 rounded-lg text-sm font-semibold hover:bg-orange-700">Add</button>
+                                </div>
+                                <div className="space-y-1 bg-orange-50 p-3 rounded-lg border border-orange-200">
+                                    {Object.entries(formData.highlights).map(([key, value]) => (
+                                        <div key={key} className="flex justify-between text-sm py-1 border-b border-orange-200 last:border-0">
+                                            <span><span className="font-semibold text-gray-800">{key}:</span> {value}</span>
+                                            <button onClick={() => handleRemoveHighlight(key)} type="button" className="text-red-500 hover:text-red-700"><X className="w-4 h-4" /></button>
+                                        </div>
+                                    ))}
+                                    {Object.keys(formData.highlights).length === 0 && <p className="text-xs text-gray-400 italic text-center">No highlights added.</p>}
+                                </div>
+                            </div>
+
+                            {/* Specifications */}
+                            <div className="md:col-span-2 border-t pt-4">
+                                <label className="block text-sm font-bold mb-2 text-gray-800 items-center gap-2">
+                                    <List className="w-4 h-4 text-gray-500" /> Specifications
+                                </label>
+                                <div className="flex gap-2 mb-3">
+                                    <input type="text" value={newSpecKey} onChange={e => setNewSpecKey(e.target.value)} className="flex-1 border p-2.5 rounded-lg text-sm" placeholder="Key (e.g. Material)" />
+                                    <input type="text" value={newSpecValue} onChange={e => setNewSpecValue(e.target.value)} className="flex-1 border p-2.5 rounded-lg text-sm" placeholder="Value (e.g. Teak Wood)" />
                                     <button onClick={handleAddSpec} type="button" className="bg-gray-900 text-white px-4 rounded-lg text-sm font-semibold hover:bg-gray-700">Add</button>
                                 </div>
                                 <div className="space-y-1 bg-gray-50 p-3 rounded-lg border border-gray-200">
@@ -448,6 +496,7 @@ export default function AdminProducts() {
                                             <button onClick={() => handleRemoveSpec(key)} type="button" className="text-red-500 hover:text-red-700"><X className="w-4 h-4" /></button>
                                         </div>
                                     ))}
+                                    {Object.keys(formData.specifications).length === 0 && <p className="text-xs text-gray-400 italic text-center">No specifications added.</p>}
                                 </div>
                             </div>
                         </div>

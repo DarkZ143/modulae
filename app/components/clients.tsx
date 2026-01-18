@@ -38,13 +38,13 @@ const Clients = () => {
   }, []);
 
   return (
-    <section className="w-full bg-white">
+    <section className="w-full bg-gray-50 ">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Horizontal Line Above */}
         <div className="border-t border-gray-200"></div>
 
         {/* Client Grid */}
-        <div className="flex flex-wrap items-center justify-center gap-x-12 gap-y-8 md:justify-around py-12 md:py-16">
+        <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-8 md:justify-around py-12 md:py-16">
           {/* Loading State Skeleton */}
           {loading ? (
             [...Array(5)].map((_, i) => (
