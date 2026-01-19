@@ -368,14 +368,7 @@ const Navbar = () => {
           <button onClick={() => setIsOpen(false)}><IconX className="w-6 h-6 text-gray-600" /></button>
         </div>
 
-        {/* Admin Link Mobile */}
-        {isAdmin && (
-          <div className="px-5 py-3 border-b">
-            <Link href="/admin-section" className="flex items-center gap-2 text-red-600 font-semibold text-sm bg-red-50 p-2 rounded-lg justify-center">
-              <LayoutDashboard className="w-4 h-4" /> Go to Admin Panel
-            </Link>
-          </div>
-        )}
+        
 
         <ul className="px-5 py-4 space-y-4">
           {/* Dynamic Mobile Menus */}
