@@ -5,16 +5,16 @@
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import Link from "next/link";
-import { User, Package, Heart, MapPin, Settings, LogOut, Plus, Trash2 } from "lucide-react";
+import { User, Package, Heart, MapPin, Settings, Plus, Trash2 } from "lucide-react";
 
 import { useAuth } from "../context/AuthContext";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
 import { db } from "@/lib/firebase";
-import { doc, getDoc, updateDoc } from "firebase/firestore";
-import { signOut } from "firebase/auth";
-import { auth } from "@/lib/firebase";
+import { doc, getDoc, updateDoc, setDoc } from "firebase/firestore";
+
+
 
 export default function AddressesPage() {
     const { user, loading } = useAuth();
@@ -41,16 +41,25 @@ export default function AddressesPage() {
         if (!user) return;
 
         const fetchAddress = async () => {
-            const userRef = doc(db, "users", user.uid);
-            const snap = await getDoc(userRef);
+            try {
+                const userRef = doc(db, "users", user.uid);
+                const snap = await getDoc(userRef);
 
-            if (snap.exists()) {
-                setAddresses(snap.data().addresses || []);
+                if (snap.exists()) {
+                    setAddresses(snap.data().addresses || []);
+                } else {
+                    setAddresses([]);
+                }
+            } catch (error) {
+                console.error("Firestore offline / fetch failed:", error);
+                // ✅ Fallback: do NOT crash UI
+                setAddresses([]);
             }
         };
 
         fetchAddress();
     }, [user]);
+
 
     // Save new address
     const handleSaveAddress = async () => {
@@ -62,40 +71,54 @@ export default function AddressesPage() {
         }
 
         const newAddress = { houseNo, village, city, state, pincode, landmark };
-
         const userRef = doc(db, "users", user.uid);
-        await updateDoc(userRef, {
-            addresses: [...addresses, newAddress],
-        });
 
-        setAddresses((prev) => [...prev, newAddress]);
+        try {
+            const snap = await getDoc(userRef);
 
-        setHouseNo("");
-        setVillage("");
-        setCity("");
-        setState("");
-        setPincode("");
-        setLandmark("");
+            if (!snap.exists()) {
+                await setDoc(userRef, {
+                    addresses: [newAddress],
+                    email: user.email || "",
+                    createdAt: new Date(),
+                });
+            } else {
+                await updateDoc(userRef, {
+                    addresses: [...addresses, newAddress],
+                });
+            }
 
-        setShowModal(false);
+            setAddresses((prev) => [...prev, newAddress]);
+            setShowModal(false);
+
+            // reset form
+            setHouseNo("");
+            setVillage("");
+            setCity("");
+            setState("");
+            setPincode("");
+            setLandmark("");
+        } catch (error) {
+            alert("Network issue. Please check your internet connection.");
+            console.error("Save address failed:", error);
+        }
     };
+
 
 
     // Delete address
     const handleDeleteAddress = async (index: number) => {
-        const updated = addresses.filter((_, i) => i !== index);
         if (!user) return;
-        const userRef = doc(db, "users", user.uid);
-        await updateDoc(userRef, { addresses: updated });
 
+        const updated = addresses.filter((_, i) => i !== index);
+        const userRef = doc(db, "users", user.uid);
+
+        await updateDoc(userRef, { addresses: updated });
         setAddresses(updated);
     };
 
-    // Logout user
-    const handleLogout = async () => {
-        await signOut(auth);
-        router.replace("/auth/login");
-    };
+
+   
 
 
     // ========================= Sidebar Component =========================
@@ -113,7 +136,7 @@ export default function AddressesPage() {
 
             <nav className="space-y-1">
                 <Link href="/profile" className="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-50 hover:text-orange-600 rounded-lg transition-colors">
-                    <User className="w-5 h-5" /> Account Settings
+                    <User className="w-5 h-5" /> Dashboard
                 </Link>
                 <Link href="/my-orders" className="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-50 hover:text-orange-600 rounded-lg transition-colors">
                     <Package className="w-5 h-5" /> My Orders
@@ -125,15 +148,10 @@ export default function AddressesPage() {
                 <Link href="/addresses" className="flex items-center gap-3 px-4 py-3 bg-orange-50 text-orange-600 font-semibold rounded-lg transition-colors">
                     <MapPin className="w-5 h-5" /> Saved Addresses
                 </Link>
-                { <Link href="/settings" className="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-50 hover:text-orange-600 rounded-lg transition-colors">
+                {<Link href="/settings" className="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-50 hover:text-orange-600 rounded-lg transition-colors">
                     <Settings className="w-5 h-5" /> Settings
-                </Link> }
-                <button
-                    onClick={handleLogout}
-                    className="w-full flex items-center gap-3 px-4 py-3 text-red-500 hover:bg-red-50 rounded-lg transition-colors mt-4 border-t border-gray-100"
-                >
-                    <LogOut className="w-5 h-5" /> Logout
-                </button>
+                </Link>}
+                
             </nav>
         </aside>
     );

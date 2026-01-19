@@ -5,7 +5,7 @@
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import Link from "next/link"; // Added Link
-import { User, Package, Heart, MapPin, Settings, LogOut } from "lucide-react"; // Added Icons
+import { User, Package, Heart, MapPin, Settings } from "lucide-react"; // Added Icons
 
 import { useAuth } from "../context/AuthContext";
 import { useEffect, useState } from "react";
@@ -104,7 +104,7 @@ export default function SettingsPage() {
 
             <nav className="space-y-1">
                 <Link href="/profile" className="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-50 hover:text-orange-600 rounded-lg transition-colors">
-                    <User className="w-5 h-5" /> Account Settings
+                    <User className="w-5 h-5" /> Dashboard
                 </Link>
                 <Link href="/my-orders" className="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-50 hover:text-orange-600 rounded-lg transition-colors">
                     <Package className="w-5 h-5" /> My Orders
@@ -119,12 +119,7 @@ export default function SettingsPage() {
                 <Link href="/settings" className="flex items-center gap-3 px-4 py-3 bg-orange-50 text-orange-600 font-semibold rounded-lg transition-colors">
                     <Settings className="w-5 h-5" /> Settings
                 </Link>
-                <button
-                    onClick={() => setLogoutModal(true)}
-                    className="w-full flex items-center gap-3 px-4 py-3 text-red-500 hover:bg-red-50 rounded-lg transition-colors mt-4 border-t border-gray-100"
-                >
-                    <LogOut className="w-5 h-5" /> Logout
-                </button>
+                
             </nav>
         </aside>
     );
@@ -187,25 +182,11 @@ export default function SettingsPage() {
                     <div className="mb-8">
                         <h3 className="text-xl font-semibold mb-4">Preferences</h3>
 
-                        <SettingToggle
-                            label="Dark Mode"
-                            value={settings.darkMode}
-                            onChange={(val) => updateSetting("darkMode", val)}
-                        />
+                        
 
-                        <div className="mt-4">
+                        <div className="mt-4 flex justify-between items-center py-3 ">
                             <label className="font-semibold">Language</label>
-                            <select
-                                value={settings.language}
-                                onChange={(e) => updateSetting("language", e.target.value)}
-                                className="w-full mt-2 border-gray-400p-2 rounded"
-                            >
-                                <option>English</option>
-                                <option>Hindi</option>
-                                <option>Spanish</option>
-                                <option>German</option>
-                                <option>French</option>
-                            </select>
+                            <span className="font-medium">English</span>
                         </div>
                     </div>
 

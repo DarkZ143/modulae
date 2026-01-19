@@ -2,7 +2,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { MapPin, ChevronDown, Crosshair, X, User, HelpCircle, LogOut, Package } from "lucide-react";
+import { MapPin, ChevronDown, Crosshair, X, User, HelpCircle, LogOut, Package, Heart, Settings } from "lucide-react";
 import { useLocation } from "../context/LocationContext";
 import { auth } from "@/lib/firebase";
 import { onAuthStateChanged, signOut } from "firebase/auth";
@@ -121,7 +121,7 @@ export default function PincodeBar() {
                                     className=" px-4 py-2 text-sm hover:bg-gray-50 hover:text-orange-600  gap-2 flex items-center justify-left"
                                     onClick={() => setIsUserMenuOpen(false)}
                                 >
-                                    <User className="w-4 h-4" /> Your Account
+                                    <User className="w-4 h-4" /> Dashboard
                                 </Link>
                                 <Link
                                     href="/my-orders"
@@ -129,6 +129,20 @@ export default function PincodeBar() {
                                     onClick={() => setIsUserMenuOpen(false)}
                                 >
                                     <Package className="w-4 h-4" /> Your Orders
+                                </Link>
+                                <Link href="/wishlist" className=" px-4 py-2 text-sm hover:bg-gray-50 hover:text-orange-600  gap-2 flex items-center justify-left"
+                                    onClick={() => setIsUserMenuOpen(false)}
+                                >
+                                    <Heart className="w-4 h-4" /> Wishlist
+                                </Link>
+                                <Link href="/addresses" className=" px-4 py-2 text-sm hover:bg-gray-50 hover:text-orange-600  gap-2 flex items-center justify-left"
+                                    onClick={() => setIsUserMenuOpen(false)}
+                                >
+                                    <MapPin className="w-4 h-4" /> Saved Addresses
+                                </Link>
+                                <Link href="/settings" className=" px-4 py-2 text-sm hover:bg-gray-50 hover:text-orange-600  gap-2 flex items-center justify-left" 
+                                onClick={()=> setIsUserMenuOpen(false)}>
+                                    <Settings className="w-4 h-4"/> Settings
                                 </Link>
                                 <button
                                     onClick={handleLogout}

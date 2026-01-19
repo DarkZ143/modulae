@@ -81,7 +81,7 @@ const HeroSlider = () => {
                     shadow-xl border-2 border-white
                     transform transition-all duration-300
                     hover:scale-110 hover:bg-gray-100 hover:shadow-2xl
-                    hover:text-white
+                    hover:text-orange-600
                     flex items-center gap-2
                     animate-fade-in-up
                   "

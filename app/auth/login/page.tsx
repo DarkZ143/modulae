@@ -176,9 +176,9 @@ export default function LoginPage() {
 
                         <button
                             onClick={handleGoogleLogin}
-                            className="w-full py-3 border-gray-400rounded-lg flex items-center justify-center gap-3 hover:bg-gray-50 transition"
-                        ><span className="text-gray-700 font-medium">Sign in With</span>
-                            <Image src="/google.png" alt="Google" width={60} height={60} />
+                            className="w-full py-3 border border-gray-200 rounded-lg flex items-center justify-center gap-3 hover:bg-orange-50 transition"
+                        ><span className="text-orange-600 font-semibold text-2xl">Login </span><span className="text-gray-700 font-medium text-xl">with</span>
+                            <Image src="/google.png" alt="Google" width={100} height={20} />
 
                         </button>
 

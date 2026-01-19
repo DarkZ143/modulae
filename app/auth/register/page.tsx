@@ -390,11 +390,11 @@ export default function RegisterPage() {
                 <button
                     onClick={handleGoogleSignUp}
                     disabled={loading}
-                    className="w-full py-3 border border-gray-300 rounded-lg flex items-center justify-center gap-2 bg-white hover:bg-gray-50 transition"
+                    className="w-full py-3 border border-gray-300 rounded-lg flex items-center justify-center gap-2 bg-white hover:bg-orange-50 transition"
                 >
-                    <p className="text-xl font-bold text-orange-500">Signup</p>
-                    <p className="text-xl font-semibold">with</p>
-                    <Image src="/google.png" alt="Google" width={100} height={20} />
+                    <p className="text-2xl font-semibold text-orange-500">Signup</p>
+                    <p className="text-xl font-medium">with</p>
+                    <Image src="/google.png" alt="Google" width={100} height={15} />
                 </button>
 
                 <p className="mt-4 text-center text-sm text-gray-500">
